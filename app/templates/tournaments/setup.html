@@ -1,0 +1,781 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ tournament.name }} · PokerSpot
+{% endblock %}
+
+{% block head %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/tournaments.css') }}"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="setup-header">
+
+    <div>
+
+        <div
+            class="
+                setup-status
+                {% if tournament.status == 'READY' %}
+                    setup-status-ready
+                {% endif %}
+            "
+        >
+            <span class="status-dot"></span>
+
+            {{ tournament.status }}
+        </div>
+
+        <h1>
+            {{ tournament.name }}
+        </h1>
+
+        <div class="setup-meta">
+
+            <span>
+                {{ tournament.tournament_date.strftime('%d/%m/%Y') }}
+            </span>
+
+            <span>
+                {{ tournament.player_count }}
+                spelare
+            </span>
+
+            <span>
+                Target
+                {{ tournament.target_duration_minutes // 60 }}h
+                {{ tournament.target_duration_minutes % 60 }}m
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="setup-header-actions">
+
+        <form
+            action="{{
+                url_for(
+                    'tournaments.regenerate_setup',
+                    tournament_id=tournament.id
+                )
+            }}"
+            method="post"
+        >
+            <button
+                class="button button-secondary"
+                type="submit"
+            >
+                Regenerera förslag
+            </button>
+        </form>
+
+        <a
+            class="button button-secondary"
+            href="{{
+                url_for(
+                    'tournaments.list_tournaments'
+                )
+            }}"
+        >
+            Alla turneringar
+        </a>
+
+    </div>
+
+</section>
+
+
+<section class="setup-summary-grid">
+
+    <article class="setup-stat">
+
+        <span>
+            TOTAL BUY-IN
+        </span>
+
+        <strong>
+            {{ tournament.total_buyins }}
+            <small>KR</small>
+        </strong>
+
+        <p>
+            {{ tournament.player_count }}
+            ×
+            {{ tournament.buy_in }} kr
+        </p>
+
+    </article>
+
+
+    <article class="setup-stat">
+
+        <span>
+            PRIZE POOL
+        </span>
+
+        <strong>
+            {{ tournament.regular_prize_pool }}
+            <small>KR</small>
+        </strong>
+
+        <p>
+            Måste fördelas exakt
+        </p>
+
+    </article>
+
+
+    <article class="setup-stat">
+
+        <span>
+            STARTING STACK
+        </span>
+
+        <strong>
+            {{
+                "{:,}".format(
+                    tournament.structure.starting_stack
+                ).replace(",", " ")
+            }}
+        </strong>
+
+        <p>
+            per spelare
+        </p>
+
+    </article>
+
+
+    <article class="setup-stat">
+
+        <span>
+            STATUS
+        </span>
+
+        <strong class="setup-status-value">
+            {{ tournament.status }}
+        </strong>
+
+        <p>
+            {% if tournament.status == "READY" %}
+                Redo att startas
+            {% else %}
+                Setup kan redigeras
+            {% endif %}
+        </p>
+
+    </article>
+
+</section>
+
+
+<form
+    action="{{
+        url_for(
+            'tournaments.save_setup',
+            tournament_id=tournament.id
+        )
+    }}"
+    method="post"
+    id="setup-form"
+>
+
+    <section class="setup-edit-grid">
+
+        <article class="setup-panel">
+
+            <div class="setup-panel-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        STARTING STACK
+                    </p>
+
+                    <h2>
+                        Marker
+                    </h2>
+
+                </div>
+
+                <span>
+                    EDITABLE
+                </span>
+
+            </div>
+
+
+            <div class="setup-input-block">
+
+                <label for="starting_stack">
+                    Startstack per spelare
+                </label>
+
+                <div class="large-number-input">
+
+                    <input
+                        id="starting_stack"
+                        name="starting_stack"
+                        type="number"
+                        min="1000"
+                        step="25"
+                        value="{{
+                            tournament.structure.starting_stack
+                        }}"
+                        required
+                    >
+
+                    <span>
+                        CHIPS
+                    </span>
+
+                </div>
+
+                <p>
+                    Nuvarande chip breakdown är systemets
+                    ursprungliga förslag. Ny exakt breakdown
+                    regenereras i en senare förbättring om
+                    startstacken ändras manuellt.
+                </p>
+
+            </div>
+
+
+            <div class="chip-breakdown">
+
+                {% for denomination, count in tournament.structure.chip_breakdown.items() %}
+
+                    <div class="chip-row">
+
+                        <div>
+
+                            <span class="chip-denomination">
+                                {{ denomination }}
+                            </span>
+
+                            <strong>
+                                {{ denomination }}-marker
+                            </strong>
+
+                        </div>
+
+                        <div class="chip-count">
+
+                            <span>
+                                ×
+                            </span>
+
+                            <strong>
+                                {{ count }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </article>
+
+
+        <article class="setup-panel">
+
+            <div class="setup-panel-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        PAYOUT STRUCTURE
+                    </p>
+
+                    <h2>
+                        Priser
+                    </h2>
+
+                </div>
+
+                <span>
+                    {{ tournament.regular_prize_pool }}
+                    KR
+                </span>
+
+            </div>
+
+
+            <div class="editable-payout-list">
+
+                {% for prize in tournament.prizes %}
+
+                    <div class="editable-payout-row">
+
+                        <div class="payout-place">
+
+                            <span>
+                                {{ prize.place }}
+                            </span>
+
+                            <strong>
+                                {% if prize.place == 1 %}
+                                    1:a plats
+                                {% elif prize.place == 2 %}
+                                    2:a plats
+                                {% elif prize.place == 3 %}
+                                    3:e plats
+                                {% else %}
+                                    {{ prize.place }}:e plats
+                                {% endif %}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="editable-money-input">
+
+                            <input
+                                name="payout_amount"
+                                type="number"
+                                min="1"
+                                step="1"
+                                value="{{ prize.amount }}"
+                                required
+                            >
+
+                            <span>
+                                KR
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <div class="payout-validation-box">
+
+                <span>
+                    REQUIRED TOTAL
+                </span>
+
+                <strong>
+                    {{ tournament.regular_prize_pool }}
+                    KR
+                </strong>
+
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <section class="blind-editor-panel">
+
+        <div class="blind-structure-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    BLIND STRUCTURE
+                </p>
+
+                <h2>
+                    Redigera nivåer
+                </h2>
+
+                <p>
+                    Alla nivåer kan ändras individuellt.
+                    Blindvärden måste fortsätta öka.
+                </p>
+
+            </div>
+
+            <button
+                class="button button-secondary"
+                id="add-level-button"
+                type="button"
+            >
+                + Lägg till nivå
+            </button>
+
+        </div>
+
+
+        <div
+            class="blind-editor-list"
+            id="blind-levels"
+        >
+
+            {% for level in tournament.structure.blind_levels %}
+
+                <div
+                    class="blind-editor-row"
+                    data-blind-row
+                >
+
+                    <div class="blind-editor-level">
+
+                        <span>
+                            LEVEL
+                        </span>
+
+                        <strong data-level-number>
+                            {{ level.position }}
+                        </strong>
+
+                    </div>
+
+
+                    <label>
+
+                        <span>
+                            SMALL
+                        </span>
+
+                        <input
+                            name="small_blind"
+                            type="number"
+                            min="1"
+                            value="{{ level.small_blind }}"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        <span>
+                            BIG
+                        </span>
+
+                        <input
+                            name="big_blind"
+                            type="number"
+                            min="1"
+                            value="{{ level.big_blind }}"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        <span>
+                            MIN
+                        </span>
+
+                        <input
+                            name="duration_minutes"
+                            type="number"
+                            min="1"
+                            max="120"
+                            value="{{ level.duration_minutes }}"
+                            required
+                        >
+
+                    </label>
+
+
+                    <button
+                        class="remove-level-button"
+                        type="button"
+                        data-remove-level
+                        aria-label="Ta bort blindnivå"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <section class="setup-bottom-bar">
+
+        <div>
+
+            <strong>
+                Spara ändringar
+            </strong>
+
+            <span>
+                Status återgår till DRAFT när
+                strukturen ändras.
+            </span>
+
+        </div>
+
+        <button
+            class="button button-primary"
+            type="submit"
+        >
+            Spara setup
+        </button>
+
+    </section>
+
+</form>
+
+
+<section class="ready-panel">
+
+    <div>
+
+        <p class="eyebrow">
+            TOURNAMENT STATUS
+        </p>
+
+        <h2>
+            Är strukturen klar?
+        </h2>
+
+        <p>
+            När turneringen markeras som READY
+            valideras payouts, startstack och samtliga
+            blindnivåer en sista gång.
+        </p>
+
+    </div>
+
+
+    <form
+        action="{{
+            url_for(
+                'tournaments.ready_tournament',
+                tournament_id=tournament.id
+            )
+        }}"
+        method="post"
+    >
+
+        <button
+            class="
+                button
+                {% if tournament.status == 'READY' %}
+                    button-secondary
+                {% else %}
+                    button-primary
+                {% endif %}
+                ready-button
+            "
+            type="submit"
+        >
+
+            {% if tournament.status == "READY" %}
+                ✓ Tournament Ready
+            {% else %}
+                Lock Structure / Ready
+            {% endif %}
+
+        </button>
+
+    </form>
+
+</section>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+    const levelsContainer =
+        document.getElementById("blind-levels");
+
+    const addLevelButton =
+        document.getElementById("add-level-button");
+
+
+    function updateLevelNumbers() {
+        const rows =
+            levelsContainer.querySelectorAll(
+                "[data-blind-row]"
+            );
+
+        rows.forEach((row, index) => {
+            const number =
+                row.querySelector(
+                    "[data-level-number]"
+                );
+
+            number.textContent =
+                index + 1;
+        });
+    }
+
+
+    function attachRemoveHandler(button) {
+        button.addEventListener(
+            "click",
+            () => {
+                const rows =
+                    levelsContainer.querySelectorAll(
+                        "[data-blind-row]"
+                    );
+
+                if (rows.length <= 1) {
+                    return;
+                }
+
+                button
+                    .closest("[data-blind-row]")
+                    .remove();
+
+                updateLevelNumbers();
+            }
+        );
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-remove-level]"
+        )
+        .forEach(
+            attachRemoveHandler
+        );
+
+
+    addLevelButton.addEventListener(
+        "click",
+        () => {
+            const rows =
+                levelsContainer.querySelectorAll(
+                    "[data-blind-row]"
+                );
+
+            const lastRow =
+                rows[
+                    rows.length - 1
+                ];
+
+            const small =
+                Number(
+                    lastRow.querySelector(
+                        '[name="small_blind"]'
+                    ).value
+                );
+
+            const big =
+                Number(
+                    lastRow.querySelector(
+                        '[name="big_blind"]'
+                    ).value
+                );
+
+            const duration =
+                Number(
+                    lastRow.querySelector(
+                        '[name="duration_minutes"]'
+                    ).value
+                );
+
+            const nextSmall =
+                Math.max(
+                    big,
+                    Math.round(
+                        small * 1.5
+                    )
+                );
+
+            const nextBig =
+                Math.max(
+                    nextSmall * 2,
+                    Math.round(
+                        big * 1.5
+                    )
+                );
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "blind-editor-row";
+
+            row.dataset.blindRow =
+                "";
+
+            row.innerHTML = `
+                <div class="blind-editor-level">
+                    <span>LEVEL</span>
+                    <strong data-level-number></strong>
+                </div>
+
+                <label>
+                    <span>SMALL</span>
+                    <input
+                        name="small_blind"
+                        type="number"
+                        min="1"
+                        value="${nextSmall}"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>BIG</span>
+                    <input
+                        name="big_blind"
+                        type="number"
+                        min="1"
+                        value="${nextBig}"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>MIN</span>
+                    <input
+                        name="duration_minutes"
+                        type="number"
+                        min="1"
+                        max="120"
+                        value="${duration}"
+                        required
+                    >
+                </label>
+
+                <button
+                    class="remove-level-button"
+                    type="button"
+                    data-remove-level
+                    aria-label="Ta bort blindnivå"
+                >
+                    ×
+                </button>
+            `;
+
+            levelsContainer.appendChild(
+                row
+            );
+
+            attachRemoveHandler(
+                row.querySelector(
+                    "[data-remove-level]"
+                )
+            );
+
+            updateLevelNumbers();
+        }
+    );
+</script>
+
+{% endblock %}

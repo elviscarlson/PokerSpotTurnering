@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ player.name }} · PokerSpot
+{% endblock %}
+
+{% block head %}
+
+<link
+    rel="stylesheet"
+    href="{{
+        url_for(
+            'static',
+            filename='css/statistics.css'
+        )
+    }}"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="player-profile-hero">
+
+    <a
+        class="profile-back"
+        href="{{
+            url_for(
+                'players.list_players'
+            )
+        }}"
+    >
+        ← All players
+    </a>
+
+
+    <div class="profile-avatar">
+        {{ player.name[0]|upper }}
+    </div>
+
+
+    <div class="profile-heading">
+
+        <p class="eyebrow">
+            PLAYER PROFILE
+        </p>
+
+        <h1>
+            {{ player.name }}
+        </h1>
+
+        <div class="profile-status">
+
+            <span>
+                {% if player.is_active %}
+                    ACTIVE
+                {% else %}
+                    ARCHIVED
+                {% endif %}
+            </span>
+
+            <a
+                href="{{
+                    url_for(
+                        'players.edit_player',
+                        player_id=player.id
+                    )
+                }}"
+            >
+                Edit player
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="career-grid">
+
+    <article>
+
+        <span>
+            TOURNAMENTS
+        </span>
+
+        <strong>
+            {{ statistics.tournaments }}
+        </strong>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            WINS
+        </span>
+
+        <strong>
+            {{ statistics.wins }}
+        </strong>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            ITM
+        </span>
+
+        <strong>
+            {{ statistics.itm_finishes }}
+        </strong>
+
+        <small>
+            {{
+                "%.0f"
+                |format(
+                    statistics
+                    .itm_percentage
+                )
+            }}%
+        </small>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            BOUNTIES
+        </span>
+
+        <strong>
+            {{ statistics.bounty_count }}
+        </strong>
+
+        <small>
+            {{
+                statistics
+                .bounty_winnings
+            }}
+            kr
+        </small>
+
+    </article>
+
+</section>
+
+
+<section class="money-grid">
+
+    <article>
+
+        <span>
+            TOTAL BUY-INS
+        </span>
+
+        <strong>
+            {{
+                statistics.total_buyins
+            }}
+            <small>KR</small>
+        </strong>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            PRIZE WINNINGS
+        </span>
+
+        <strong>
+            {{
+                statistics
+                .prize_winnings
+            }}
+            <small>KR</small>
+        </strong>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            TOTAL WINNINGS
+        </span>
+
+        <strong>
+            {{
+                statistics
+                .total_winnings
+            }}
+            <small>KR</small>
+        </strong>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            NET RESULT
+        </span>
+
+        <strong
+            class="
+                {% if statistics.net_result > 0 %}
+                    money-positive
+                {% elif statistics.net_result < 0 %}
+                    money-negative
+                {% endif %}
+            "
+        >
+            {% if
+                statistics.net_result > 0
+            %}
+                +
+            {% endif %}
+            {{ statistics.net_result }}
+            <small>KR</small>
+        </strong>
+
+    </article>
+
+</section>
+
+
+<section class="profile-history-section">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+
+            <p class="eyebrow">
+                HISTORY
+            </p>
+
+            <h2>
+                Tournament results
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="profile-history-list">
+
+        {% for entry in entries %}
+
+            <a
+                class="profile-history-row"
+                href="{{
+                    url_for(
+                        'tournaments.result',
+                        tournament_id=(
+                            entry.tournament.id
+                        )
+                    )
+                }}"
+            >
+
+                <div class="profile-history-place">
+
+                    <strong>
+                        #{{ entry.placement }}
+                    </strong>
+
+                </div>
+
+
+                <div class="profile-history-tournament">
+
+                    <strong>
+                        {{
+                            entry
+                            .tournament
+                            .name
+                        }}
+                    </strong>
+
+                    <span>
+                        {{
+                            entry
+                            .tournament
+                            .tournament_date
+                            .strftime(
+                                '%d %b %Y'
+                            )
+                        }}
+                        ·
+                        {{
+                            entry
+                            .tournament
+                            .player_count
+                        }}
+                        players
+                    </span>
+
+                </div>
+
+
+                <div class="profile-history-money">
+
+                    <strong>
+                        {{
+                            entry.total_winnings
+                        }}
+                        KR
+                    </strong>
+
+                    <span>
+                        winnings
+                    </span>
+
+                </div>
+
+
+                <div class="profile-history-net">
+
+                    {% set entry_net =
+                        entry.total_winnings
+                        -
+                        entry.tournament.buy_in
+                    %}
+
+                    <strong
+                        class="
+                            {% if entry_net > 0 %}
+                                money-positive
+                            {% elif entry_net < 0 %}
+                                money-negative
+                            {% endif %}
+                        "
+                    >
+                        {% if entry_net > 0 %}
+                            +
+                        {% endif %}
+                        {{ entry_net }}
+                        KR
+                    </strong>
+
+                    <span>
+                        net
+                    </span>
+
+                </div>
+
+            </a>
+
+        {% else %}
+
+            <div class="history-empty">
+
+                <span>
+                    NO RESULTS
+                </span>
+
+                <h2>
+                    Ingen färdigspelad turnering ännu.
+                </h2>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

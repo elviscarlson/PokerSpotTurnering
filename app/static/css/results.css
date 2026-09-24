@@ -1,0 +1,617 @@
+.result-hero {
+    position: relative;
+
+    min-height: 420px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding:
+        70px
+        20px;
+
+    overflow: hidden;
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            rgba(225, 29, 46, 0.13),
+            transparent 38%
+        );
+}
+
+
+.result-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 28px;
+
+    color: var(--success);
+
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+}
+
+
+.result-status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background:
+        var(--success);
+
+    box-shadow:
+        0 0 14px
+        rgba(167, 243, 208, 0.5);
+}
+
+
+.result-hero .eyebrow {
+    margin-bottom: 10px;
+}
+
+
+.result-hero h1 {
+    margin: 0;
+
+    font-size:
+        clamp(
+            45px,
+            7vw,
+            86px
+        );
+
+    letter-spacing:
+        -0.065em;
+}
+
+
+.winner-block {
+    display: grid;
+    gap: 5px;
+
+    margin-top: 40px;
+}
+
+
+.winner-label {
+    color:
+        var(--text-muted);
+
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+}
+
+
+.winner-block strong {
+    font-size:
+        clamp(
+            32px,
+            5vw,
+            52px
+        );
+
+    letter-spacing:
+        -0.05em;
+}
+
+
+.winner-block p {
+    margin: 0;
+
+    color:
+        var(--text-secondary);
+
+    font-size: 13px;
+}
+
+
+.result-summary {
+    display: grid;
+    grid-template-columns:
+        repeat(4, 1fr);
+    gap: 10px;
+
+    padding:
+        30px
+        0
+        10px;
+}
+
+
+.result-summary article {
+    min-height: 130px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: 20px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        var(--radius-medium);
+
+    background:
+        var(--surface);
+}
+
+
+.result-summary span {
+    color:
+        var(--text-muted);
+
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+}
+
+
+.result-summary strong {
+    font-size: 30px;
+
+    letter-spacing:
+        -0.045em;
+}
+
+
+.result-summary small {
+    color:
+        var(--text-muted);
+
+    font-size: 9px;
+}
+
+
+.result-layout {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.4fr)
+        minmax(300px, 0.6fr);
+    gap: 10px;
+
+    padding-bottom: 10px;
+}
+
+
+.result-side {
+    display: grid;
+    gap: 10px;
+}
+
+
+.result-panel {
+    overflow: hidden;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        var(--radius-medium);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.02),
+            transparent
+        ),
+        var(--surface);
+}
+
+
+.result-panel-heading {
+    min-height: 85px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 20px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+}
+
+
+.result-panel-heading .eyebrow {
+    margin-bottom: 7px;
+}
+
+
+.result-panel-heading h2 {
+    margin: 0;
+
+    font-size: 22px;
+
+    letter-spacing:
+        -0.04em;
+}
+
+
+.result-panel-heading > span {
+    color:
+        var(--text-muted);
+
+    font-size: 10px;
+}
+
+
+.standing-row {
+    min-height: 78px;
+
+    display: grid;
+    grid-template-columns:
+        46px
+        minmax(0, 1fr)
+        110px
+        110px;
+    align-items: center;
+    gap: 12px;
+
+    padding:
+        10px
+        20px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+}
+
+
+.standing-row:last-child {
+    border-bottom: 0;
+}
+
+
+.standing-row-winner {
+    min-height: 95px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(225, 29, 46, 0.09),
+            transparent
+        );
+}
+
+
+.standing-place span {
+    width: 32px;
+    height: 32px;
+
+    display: grid;
+    place-items: center;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 9px;
+
+    color:
+        var(--text-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+
+.standing-place .winner-crown {
+    border-color:
+        rgba(225, 29, 46, 0.5);
+
+    background:
+        rgba(225, 29, 46, 0.12);
+
+    color:
+        var(--accent-bright);
+}
+
+
+.standing-player {
+    min-width: 0;
+
+    display: grid;
+    gap: 5px;
+}
+
+
+.standing-player strong {
+    overflow: hidden;
+
+    font-size: 13px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.standing-player span,
+.standing-money span,
+.standing-total span {
+    color:
+        var(--text-muted);
+
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+
+.standing-money,
+.standing-total {
+    display: grid;
+    gap: 4px;
+
+    text-align: right;
+}
+
+
+.standing-money strong,
+.standing-total strong {
+    font-size: 12px;
+}
+
+
+.standing-total strong {
+    color:
+        var(--success);
+}
+
+
+.standing-zero {
+    color:
+        var(--text-muted) !important;
+}
+
+
+.bounty-result-row {
+    min-height: 63px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding:
+        10px
+        20px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+}
+
+
+.bounty-result-row > div {
+    display: grid;
+    gap: 5px;
+}
+
+
+.bounty-result-row strong {
+    font-size: 12px;
+}
+
+
+.bounty-result-row span {
+    color:
+        var(--text-muted);
+
+    font-size: 9px;
+}
+
+
+.result-check {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin: 16px;
+    padding: 13px;
+
+    border:
+        1px solid
+        rgba(167, 243, 208, 0.15);
+
+    border-radius: 9px;
+
+    background:
+        rgba(167, 243, 208, 0.025);
+}
+
+
+.result-check span {
+    color:
+        var(--text-muted);
+
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+
+.result-check strong {
+    color:
+        var(--success);
+
+    font-size: 10px;
+}
+
+
+.result-empty {
+    padding: 28px 20px;
+
+    color:
+        var(--text-muted);
+
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+
+.accounting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 50px;
+
+    padding:
+        0
+        20px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+    color:
+        var(--text-secondary);
+
+    font-size: 10px;
+}
+
+
+.accounting-row strong {
+    font-size: 11px;
+}
+
+
+.accounting-total {
+    border-bottom: 0;
+
+    color:
+        var(--text);
+}
+
+
+.accounting-total strong {
+    color:
+        var(--success);
+}
+
+
+.result-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+
+    margin-bottom: 80px;
+    padding: 24px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        var(--radius-medium);
+
+    background:
+        var(--surface);
+}
+
+
+.result-actions > div:first-child {
+    display: grid;
+    gap: 5px;
+}
+
+
+.result-actions > div:first-child strong {
+    font-size: 13px;
+}
+
+
+.result-actions > div:first-child span {
+    color:
+        var(--text-muted);
+
+    font-size: 10px;
+}
+
+
+.result-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.result-action-buttons form {
+    margin: 0;
+}
+
+
+@media (max-width: 950px) {
+    .result-summary {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .result-layout {
+        grid-template-columns: 1fr;
+    }
+
+
+    .result-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 650px) {
+    .result-summary {
+        grid-template-columns:
+            1fr
+            1fr;
+    }
+
+
+    .standing-row {
+        grid-template-columns:
+            38px
+            1fr
+            90px;
+    }
+
+
+    .standing-total {
+        display: none;
+    }
+
+
+    .result-action-buttons {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+
+    .result-action-buttons form,
+    .result-action-buttons .button {
+        width: 100%;
+    }
+}

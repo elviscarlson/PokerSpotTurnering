@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}
+Redigera {{ player.name }} · PokerSpot Tournament
+{% endblock %}
+
+{% block content %}
+
+<section class="narrow-page">
+
+    <a
+        class="back-link"
+        href="{{ url_for('players.list_players') }}"
+    >
+        ← Tillbaka till spelare
+    </a>
+
+
+    <div class="panel edit-player-panel">
+
+        <div class="panel-heading">
+
+            <p class="eyebrow">
+                EDIT PLAYER
+            </p>
+
+            <h1>
+                {{ player.name }}
+            </h1>
+
+            <p>
+                Ändra spelarens namn utan att skapa en ny
+                spelarprofil.
+            </p>
+
+        </div>
+
+
+        <form
+            class="player-form"
+            method="post"
+        >
+
+            <div class="form-group">
+
+                <label for="name">
+                    Namn
+                </label>
+
+                <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    maxlength="80"
+                    value="{{ player.name }}"
+                    autocomplete="off"
+                    required
+                    autofocus
+                >
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a
+                    class="button button-secondary"
+                    href="{{ url_for('players.list_players') }}"
+                >
+                    Avbryt
+                </a>
+
+                <button
+                    class="button button-primary"
+                    type="submit"
+                >
+                    Spara ändringar
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

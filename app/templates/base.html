@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#070707"
+    >
+
+    <title>
+        {% block title %}
+            PokerSpot Tournament
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/app.css') }}"
+    >
+
+    {% block head %}
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+    <div class="app-shell">
+
+        <header class="site-header">
+
+            <div class="site-header-inner">
+
+                <a
+                    class="brand"
+                    href="{{ url_for('main.dashboard') }}"
+                >
+
+                    <span class="brand-mark">
+                        P
+                    </span>
+
+                    <span class="brand-copy">
+
+                        <strong>
+                            POKERSPOT
+                        </strong>
+
+                        <small>
+                            TOURNAMENT
+                        </small>
+
+                    </span>
+
+                </a>
+
+
+                <nav
+                    class="main-nav"
+                    aria-label="Huvudnavigation"
+                >
+
+                    <a
+                        class="
+                            nav-link
+                            {% if request.endpoint == 'main.dashboard' %}
+                                nav-link-active
+                            {% endif %}
+                        "
+                        href="{{ url_for('main.dashboard') }}"
+                    >
+                        Dashboard
+                    </a>
+
+
+                    <a
+                        class="
+                            nav-link
+                            {% if request.blueprint == 'tournaments' %}
+                                nav-link-active
+                            {% endif %}
+                        "
+                        href="{{ url_for('tournaments.list_tournaments') }}"
+                    >
+                        Turneringar
+                    </a>
+
+
+                    <a
+                        class="
+                            nav-link
+                            {% if request.blueprint == 'players' %}
+                                nav-link-active
+                            {% endif %}
+                        "
+                        href="{{ url_for('players.list_players') }}"
+                    >
+                        Spelare
+                    </a>
+
+                </nav>
+
+
+                <div class="header-actions">
+
+                    <span class="header-live-indicator">
+
+                        <span></span>
+
+                        LOCAL
+                    </span>
+
+
+                    <a
+                        class="button button-primary header-new-button"
+                        href="{{ url_for('tournaments.new_tournament') }}"
+                    >
+                        + Ny turnering
+                    </a>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                <div class="flash-stack">
+
+                    {% for category, message in messages %}
+
+                        <div
+                            class="
+                                flash-message
+                                flash-{{ category }}
+                            "
+                            role="status"
+                        >
+
+                            <div class="flash-icon">
+
+                                {% if category == "success" %}
+                                    ✓
+                                {% else %}
+                                    !
+                                {% endif %}
+
+                            </div>
+
+                            <span>
+                                {{ message }}
+                            </span>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <main class="site-main">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+
+    <script
+        src="{{ url_for('static', filename='js/app.js') }}"
+        defer
+    ></script>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+
+</html>

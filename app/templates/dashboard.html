@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+
+{% block title %}
+PokerSpot Tournament
+{% endblock %}
+
+{% block head %}
+
+<link
+    rel="stylesheet"
+    href="{{
+        url_for(
+            'static',
+            filename='css/statistics.css'
+        )
+    }}"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-hero">
+
+    <div class="dashboard-hero-copy">
+
+        <p class="eyebrow">
+            POKERSPOT TOURNAMENT
+        </p>
+
+        <h1>
+            Run the table.
+        </h1>
+
+        <p>
+            Skapa turneringen, sätt strukturen och låt
+            appen hålla reda på resten.
+        </p>
+
+        <div class="dashboard-actions">
+
+            <a
+                class="button button-primary"
+                href="{{
+                    url_for(
+                        'tournaments.new_tournament'
+                    )
+                }}"
+            >
+                New Tournament
+            </a>
+
+            <a
+                class="button button-secondary"
+                href="{{
+                    url_for(
+                        'tournaments.list_tournaments'
+                    )
+                }}"
+            >
+                Tournament History
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-mark">
+        P
+    </div>
+
+</section>
+
+
+<section class="dashboard-metrics">
+
+    <article>
+
+        <span>
+            TOURNAMENTS
+        </span>
+
+        <strong>
+            {{
+                statistics.completed_tournaments
+            }}
+        </strong>
+
+        <p>
+            completed
+        </p>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            PLAYERS
+        </span>
+
+        <strong>
+            {{ statistics.total_players }}
+        </strong>
+
+        <p>
+            registered
+        </p>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            MONEY PLAYED
+        </span>
+
+        <strong>
+            {{
+                statistics.total_money_played
+            }}
+            <small>KR</small>
+        </strong>
+
+        <p>
+            all-time buy-ins
+        </p>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            BOUNTIES
+        </span>
+
+        <strong>
+            {{
+                statistics.total_bounty_money
+            }}
+            <small>KR</small>
+        </strong>
+
+        <p>
+            distributed
+        </p>
+
+    </article>
+
+</section>
+
+
+{% if statistics.latest_tournament %}
+
+<section class="dashboard-section">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+
+            <p class="eyebrow">
+                LATEST TOURNAMENT
+            </p>
+
+            <h2>
+                Senaste resultat
+            </h2>
+
+        </div>
+
+
+        <a
+            href="{{
+                url_for(
+                    'tournaments.result',
+                    tournament_id=(
+                        statistics
+                        .latest_tournament
+                        .id
+                    )
+                )
+            }}"
+        >
+            View results →
+        </a>
+
+    </div>
+
+
+    <a
+        class="latest-tournament-card"
+        href="{{
+            url_for(
+                'tournaments.result',
+                tournament_id=(
+                    statistics
+                    .latest_tournament
+                    .id
+                )
+            )
+        }}"
+    >
+
+        <div>
+
+            <span>
+                {{
+                    statistics
+                    .latest_tournament
+                    .tournament_date
+                    .strftime('%d %b %Y')
+                }}
+            </span>
+
+            <h3>
+                {{
+                    statistics
+                    .latest_tournament
+                    .name
+                }}
+            </h3>
+
+            <p>
+                {{
+                    statistics
+                    .latest_tournament
+                    .player_count
+                }}
+                players ·
+                {{
+                    statistics
+                    .latest_tournament
+                    .regular_prize_pool
+                }}
+                kr prize pool
+            </p>
+
+        </div>
+
+
+        <div class="latest-winner">
+
+            <span>
+                WINNER
+            </span>
+
+            <strong>
+                {% if
+                    statistics
+                    .latest_tournament
+                    .winner
+                %}
+                    {{
+                        statistics
+                        .latest_tournament
+                        .winner
+                        .player
+                        .name
+                    }}
+                {% else %}
+                    —
+                {% endif %}
+            </strong>
+
+        </div>
+
+    </a>
+
+</section>
+
+{% endif %}
+
+
+<section class="dashboard-section">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+
+            <p class="eyebrow">
+                ALL TIME
+            </p>
+
+            <h2>
+                Leaderboards
+            </h2>
+
+        </div>
+
+
+        <a
+            href="{{
+                url_for(
+                    'players.list_players'
+                )
+            }}"
+        >
+            All players →
+        </a>
+
+    </div>
+
+
+    <div class="leaderboard-grid">
+
+        <article class="leaderboard-card">
+
+            <div class="leaderboard-heading">
+
+                <span>
+                    TOTAL WINNINGS
+                </span>
+
+                <strong>
+                    KR
+                </strong>
+
+            </div>
+
+
+            <div class="leaderboard-list">
+
+                {% for stat in winnings_leaders %}
+
+                    <a
+                        class="leaderboard-row"
+                        href="{{
+                            url_for(
+                                'players.player_detail',
+                                player_id=(
+                                    stat.player.id
+                                )
+                            )
+                        }}"
+                    >
+
+                        <span class="leaderboard-rank">
+                            {{ loop.index }}
+                        </span>
+
+                        <strong>
+                            {{ stat.player.name }}
+                        </strong>
+
+                        <span>
+                            {{
+                                stat.total_winnings
+                            }}
+                        </span>
+
+                    </a>
+
+                {% else %}
+
+                    <div class="leaderboard-empty">
+                        Ingen statistik ännu.
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </article>
+
+
+        <article class="leaderboard-card">
+
+            <div class="leaderboard-heading">
+
+                <span>
+                    MOST WINS
+                </span>
+
+                <strong>
+                    W
+                </strong>
+
+            </div>
+
+
+            <div class="leaderboard-list">
+
+                {% for stat in win_leaders %}
+
+                    <a
+                        class="leaderboard-row"
+                        href="{{
+                            url_for(
+                                'players.player_detail',
+                                player_id=(
+                                    stat.player.id
+                                )
+                            )
+                        }}"
+                    >
+
+                        <span class="leaderboard-rank">
+                            {{ loop.index }}
+                        </span>
+
+                        <strong>
+                            {{ stat.player.name }}
+                        </strong>
+
+                        <span>
+                            {{ stat.wins }}
+                        </span>
+
+                    </a>
+
+                {% else %}
+
+                    <div class="leaderboard-empty">
+                        Ingen statistik ännu.
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </article>
+
+
+        <article class="leaderboard-card">
+
+            <div class="leaderboard-heading">
+
+                <span>
+                    MOST BOUNTIES
+                </span>
+
+                <strong>
+                    KO
+                </strong>
+
+            </div>
+
+
+            <div class="leaderboard-list">
+
+                {% for stat in bounty_leaders %}
+
+                    <a
+                        class="leaderboard-row"
+                        href="{{
+                            url_for(
+                                'players.player_detail',
+                                player_id=(
+                                    stat.player.id
+                                )
+                            )
+                        }}"
+                    >
+
+                        <span class="leaderboard-rank">
+                            {{ loop.index }}
+                        </span>
+
+                        <strong>
+                            {{ stat.player.name }}
+                        </strong>
+
+                        <span>
+                            {{
+                                stat.bounty_count
+                            }}
+                        </span>
+
+                    </a>
+
+                {% else %}
+
+                    <div class="leaderboard-empty">
+                        Ingen statistik ännu.
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+<section class="dashboard-footer-cta">
+
+    <div>
+
+        <p class="eyebrow">
+            NEXT GAME
+        </p>
+
+        <h2>
+            Ready for another one?
+        </h2>
+
+        <p>
+            Välj spelarna och låt PokerSpot bygga
+            nästa struktur automatiskt.
+        </p>
+
+    </div>
+
+
+    <a
+        class="button button-primary"
+        href="{{
+            url_for(
+                'tournaments.new_tournament'
+            )
+        }}"
+    >
+        Create Tournament
+    </a>
+
+</section>
+
+{% endblock %}

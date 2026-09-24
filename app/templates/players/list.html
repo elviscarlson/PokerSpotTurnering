@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}
+Spelare · PokerSpot
+{% endblock %}
+
+{% block head %}
+
+<link
+    rel="stylesheet"
+    href="{{
+        url_for(
+            'static',
+            filename='css/statistics.css'
+        )
+    }}"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="players-page-header">
+
+    <div>
+
+        <p class="eyebrow">
+            PLAYER REGISTRY
+        </p>
+
+        <h1>
+            Spelare
+        </h1>
+
+        <p>
+            {{ active_count }} aktiva spelare.
+            Historik och statistik följer spelarprofilen
+            mellan turneringar.
+        </p>
+
+    </div>
+
+</section>
+
+
+<section class="add-player-panel">
+
+    <form
+        action="{{
+            url_for(
+                'players.add_player'
+            )
+        }}"
+        method="post"
+        class="add-player-form"
+    >
+
+        <div>
+
+            <label for="player-name">
+                Add player
+            </label>
+
+            <input
+                id="player-name"
+                name="name"
+                type="text"
+                maxlength="80"
+                placeholder="Spelarens namn"
+                autocomplete="off"
+                required
+            >
+
+        </div>
+
+        <button
+            class="button button-primary"
+            type="submit"
+        >
+            Add Player
+        </button>
+
+    </form>
+
+</section>
+
+
+<section class="player-registry">
+
+    {% for player in players %}
+
+        {% set stat =
+            statistics[player.id]
+        %}
+
+        <article
+            class="
+                registry-player-card
+                {% if not player.is_active %}
+                    registry-player-inactive
+                {% endif %}
+            "
+        >
+
+            <a
+                class="registry-player-main"
+                href="{{
+                    url_for(
+                        'players.player_detail',
+                        player_id=player.id
+                    )
+                }}"
+            >
+
+                <div class="registry-avatar">
+                    {{
+                        player.name[0]
+                        |upper
+                    }}
+                </div>
+
+
+                <div class="registry-player-name">
+
+                    <strong>
+                        {{ player.name }}
+                    </strong>
+
+                    <span>
+                        {% if player.is_active %}
+                            ACTIVE
+                        {% else %}
+                            ARCHIVED
+                        {% endif %}
+                    </span>
+
+                </div>
+
+
+                <div class="registry-stat">
+
+                    <span>
+                        TOURNAMENTS
+                    </span>
+
+                    <strong>
+                        {{ stat.tournaments }}
+                    </strong>
+
+                </div>
+
+
+                <div class="registry-stat">
+
+                    <span>
+                        WINS
+                    </span>
+
+                    <strong>
+                        {{ stat.wins }}
+                    </strong>
+
+                </div>
+
+
+                <div class="registry-stat">
+
+                    <span>
+                        NET
+                    </span>
+
+                    <strong
+                        class="
+                            {% if stat.net_result > 0 %}
+                                money-positive
+                            {% elif stat.net_result < 0 %}
+                                money-negative
+                            {% endif %}
+                        "
+                    >
+                        {% if stat.net_result > 0 %}
+                            +
+                        {% endif %}
+                        {{ stat.net_result }}
+                        KR
+                    </strong>
+
+                </div>
+
+            </a>
+
+
+            <div class="registry-actions">
+
+                <a
+                    class="registry-action"
+                    href="{{
+                        url_for(
+                            'players.edit_player',
+                            player_id=player.id
+                        )
+                    }}"
+                >
+                    Edit
+                </a>
+
+
+                <form
+                    action="{{
+                        url_for(
+                            'players.toggle_active',
+                            player_id=player.id
+                        )
+                    }}"
+                    method="post"
+                >
+
+                    <button
+                        class="registry-action"
+                        type="submit"
+                    >
+                        {% if player.is_active %}
+                            Archive
+                        {% else %}
+                            Restore
+                        {% endif %}
+                    </button>
+
+                </form>
+
+            </div>
+
+        </article>
+
+    {% else %}
+
+        <div class="history-empty">
+
+            <span>
+                NO PLAYERS
+            </span>
+
+            <h2>
+                Lägg till första spelaren.
+            </h2>
+
+        </div>
+
+    {% endfor %}
+
+</section>
+
+{% endblock %}

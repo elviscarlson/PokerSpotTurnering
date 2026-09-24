@@ -1,0 +1,504 @@
+{% extends "base.html" %}
+
+{% block title %}
+Ny turnering · PokerSpot
+{% endblock %}
+
+{% block head %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/tournaments.css') }}"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="tournament-page-header">
+
+    <div>
+
+        <p class="eyebrow">
+            NEW TOURNAMENT
+        </p>
+
+        <h1>
+            Skapa turnering
+        </h1>
+
+        <p>
+            Ange grunderna. Payouts, startstack och blinds
+            genereras i nästa steg.
+        </p>
+
+    </div>
+
+</section>
+
+
+<form
+    class="tournament-form"
+    method="post"
+>
+
+    <section class="tournament-form-main">
+
+        <div class="tournament-form-card">
+
+            <div class="form-section-heading">
+
+                <span>
+                    01
+                </span>
+
+                <div>
+
+                    <h2>
+                        Turnering
+                    </h2>
+
+                    <p>
+                        Grundläggande information om pokerkvällen.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-field form-field-wide">
+
+                    <label for="name">
+                        Turneringsnamn
+                    </label>
+
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        maxlength="120"
+                        placeholder="Friday Poker"
+                        value="{{ request.form.get('name', '') }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="tournament_date">
+                        Datum
+                    </label>
+
+                    <input
+                        id="tournament_date"
+                        name="tournament_date"
+                        type="date"
+                        value="{{
+                            request.form.get(
+                                'tournament_date',
+                                today
+                            )
+                        }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>
+                        Önskad längd
+                    </label>
+
+                    <div class="duration-fields">
+
+                        <div>
+
+                            <input
+                                name="duration_hours"
+                                type="number"
+                                min="0"
+                                max="24"
+                                value="{{
+                                    request.form.get(
+                                        'duration_hours',
+                                        '4'
+                                    )
+                                }}"
+                                required
+                            >
+
+                            <span>
+                                timmar
+                            </span>
+
+                        </div>
+
+
+                        <div>
+
+                            <input
+                                name="duration_minutes"
+                                type="number"
+                                min="0"
+                                max="59"
+                                step="5"
+                                value="{{
+                                    request.form.get(
+                                        'duration_minutes',
+                                        '0'
+                                    )
+                                }}"
+                                required
+                            >
+
+                            <span>
+                                min
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="tournament-form-card">
+
+            <div class="form-section-heading">
+
+                <span>
+                    02
+                </span>
+
+                <div>
+
+                    <h2>
+                        Ekonomi
+                    </h2>
+
+                    <p>
+                        Alla spelare har samma buy-in.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-field">
+
+                    <label for="buy_in">
+                        Buy-in
+                    </label>
+
+                    <div class="money-input">
+
+                        <input
+                            id="buy_in"
+                            name="buy_in"
+                            type="number"
+                            min="1"
+                            step="1"
+                            placeholder="300"
+                            value="{{
+                                request.form.get(
+                                    'buy_in',
+                                    '300'
+                                )
+                            }}"
+                            required
+                        >
+
+                        <span>
+                            KR
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label class="toggle-row">
+
+                        <span>
+
+                            <strong>
+                                Bounty tournament
+                            </strong>
+
+                            <small>
+                                Del av buy-in går till bounty.
+                            </small>
+
+                        </span>
+
+                        <input
+                            id="bounty_enabled"
+                            name="bounty_enabled"
+                            type="checkbox"
+                            {% if request.form.get('bounty_enabled') %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="toggle-switch"></span>
+
+                    </label>
+
+                </div>
+
+
+                <div
+                    class="
+                        form-field
+                        form-field-wide
+                        bounty-field
+                    "
+                    id="bounty-field"
+                >
+
+                    <label for="bounty_amount">
+                        Bounty per spelare
+                    </label>
+
+                    <div class="money-input">
+
+                        <input
+                            id="bounty_amount"
+                            name="bounty_amount"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="{{
+                                request.form.get(
+                                    'bounty_amount',
+                                    '50'
+                                )
+                            }}"
+                        >
+
+                        <span>
+                            KR
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="tournament-form-card">
+
+            <div class="form-section-heading">
+
+                <span>
+                    03
+                </span>
+
+                <div>
+
+                    <h2>
+                        Spelare
+                    </h2>
+
+                    <p>
+                        Välj minst två spelare från registret.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if players %}
+
+                <div class="tournament-player-grid">
+
+                    {% for player in players %}
+
+                        <label class="player-select-card">
+
+                            <input
+                                name="player_ids"
+                                type="checkbox"
+                                value="{{ player.id }}"
+                                {% if
+                                    player.id|string
+                                    in request.form.getlist('player_ids')
+                                %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <span class="player-select-content">
+
+                                <span class="player-select-avatar">
+                                    {{ player.name[0]|upper }}
+                                </span>
+
+                                <strong>
+                                    {{ player.name }}
+                                </strong>
+
+                                <span class="player-select-check">
+                                    ✓
+                                </span>
+
+                            </span>
+
+                        </label>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="no-players">
+
+                    <strong>
+                        Inga spelare finns ännu.
+                    </strong>
+
+                    <p>
+                        Lägg till minst två spelare innan
+                        du skapar en turnering.
+                    </p>
+
+                    <a
+                        class="button button-secondary"
+                        href="{{ url_for('players.list_players') }}"
+                    >
+                        Hantera spelare
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <aside class="tournament-create-sidebar">
+
+        <div class="creation-summary">
+
+            <p class="eyebrow">
+                TOURNAMENT
+            </p>
+
+            <h3>
+                Redo att skapa?
+            </h3>
+
+            <p>
+                Nästa sida blir turneringens setup där
+                strukturen byggs.
+            </p>
+
+
+            <div class="summary-divider"></div>
+
+
+            <div class="creation-summary-row">
+
+                <span>
+                    Status
+                </span>
+
+                <strong>
+                    DRAFT
+                </strong>
+
+            </div>
+
+
+            <div class="creation-summary-row">
+
+                <span>
+                    Rake
+                </span>
+
+                <strong>
+                    0 KR
+                </strong>
+
+            </div>
+
+
+            {% if players %}
+
+                <button
+                    class="
+                        button
+                        button-primary
+                        button-full
+                        create-tournament-button
+                    "
+                    type="submit"
+                >
+                    Skapa turnering
+                    <span>
+                        →
+                    </span>
+                </button>
+
+            {% endif %}
+
+        </div>
+
+    </aside>
+
+</form>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+    const bountyToggle =
+        document.getElementById("bounty_enabled");
+
+    const bountyField =
+        document.getElementById("bounty-field");
+
+    function updateBountyField() {
+        if (!bountyToggle || !bountyField) {
+            return;
+        }
+
+        bountyField.hidden = !bountyToggle.checked;
+    }
+
+    if (bountyToggle) {
+        bountyToggle.addEventListener(
+            "change",
+            updateBountyField
+        );
+
+        updateBountyField();
+    }
+</script>
+
+{% endblock %}

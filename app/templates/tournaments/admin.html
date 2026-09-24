@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ tournament.name }} · Tournament Control
+{% endblock %}
+
+{% block head %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/tournaments.css') }}"
+>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/clock.css') }}"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<div
+    class="clock-app"
+    data-clock-app
+    data-tournament-id="{{ tournament.id }}"
+>
+
+    <header class="clock-header">
+
+        <div>
+
+            <p class="eyebrow">
+                LIVE TOURNAMENT CONTROL
+            </p>
+
+            <h1>
+                {{ tournament.name }}
+            </h1>
+
+        </div>
+
+
+        <div class="clock-header-actions">
+
+            <span
+                class="clock-status"
+                data-clock-status
+            >
+                {{ tournament.status }}
+            </span>
+
+            <a
+                class="button button-primary"
+                href="{{
+                    url_for(
+                        'tournaments.display',
+                        tournament_id=tournament.id
+                    )
+                }}"
+                target="_blank"
+                rel="noopener"
+            >
+                Open Display
+            </a>
+
+            <a
+                class="button button-secondary"
+                href="{{
+                    url_for(
+                        'tournaments.setup',
+                        tournament_id=tournament.id
+                    )
+                }}"
+            >
+                Setup
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <section class="live-admin-grid">
+
+        <div class="live-clock-column">
+
+            <section class="clock-main-panel">
+
+                <div class="clock-level-label">
+                    LEVEL
+                    <strong data-level-number>
+                        —
+                    </strong>
+                </div>
+
+
+                <div
+                    class="clock-timer"
+                    data-clock-timer
+                >
+                    --:--
+                </div>
+
+
+                <div class="clock-current-blinds">
+
+                    <span>
+                        CURRENT BLINDS
+                    </span>
+
+                    <strong>
+                        <span data-small-blind>—</span>
+                        <i>/</i>
+                        <span data-big-blind>—</span>
+                    </strong>
+
+                </div>
+
+
+                <div class="clock-next-level">
+
+                    <span>
+                        NEXT
+                    </span>
+
+                    <strong data-next-blinds>
+                        —
+                    </strong>
+
+                </div>
+
+            </section>
+
+
+            <section class="clock-controls">
+
+                <div class="clock-primary-controls">
+
+                    <button
+                        class="
+                            clock-control
+                            clock-control-primary
+                        "
+                        type="button"
+                        data-clock-action="start"
+                    >
+                        Start tournament
+                    </button>
+
+                    <button
+                        class="clock-control"
+                        type="button"
+                        data-clock-action="pause"
+                    >
+                        Pause
+                    </button>
+
+                    <button
+                        class="clock-control"
+                        type="button"
+                        data-clock-action="resume"
+                    >
+                        Resume
+                    </button>
+
+                </div>
+
+
+                <div class="clock-level-controls">
+
+                    <button
+                        class="clock-control"
+                        type="button"
+                        data-clock-action="previous-level"
+                    >
+                        ← Previous
+                    </button>
+
+                    <button
+                        class="clock-control"
+                        type="button"
+                        data-clock-action="reset-level"
+                    >
+                        Reset level
+                    </button>
+
+                    <button
+                        class="clock-control"
+                        type="button"
+                        data-clock-action="next-level"
+                    >
+                        Next →
+                    </button>
+
+                </div>
+
+
+                <div class="clock-time-controls">
+
+                    <button
+                        class="clock-control"
+                        type="button"
+                        data-adjust-seconds="-60"
+                    >
+                        −1 min
+                    </button>
+
+                    <button
+                        class="clock-control"
+                        type="button"
+                        data-adjust-seconds="60"
+                    >
+                        +1 min
+                    </button>
+
+                    <button
+                        class="clock-control"
+                        type="button"
+                        data-adjust-seconds="300"
+                    >
+                        +5 min
+                    </button>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <aside class="live-player-panel">
+
+            <div class="live-panel-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        PLAYERS
+                    </p>
+
+                    <h2>
+                        Spelare kvar
+                    </h2>
+
+                </div>
+
+                <strong data-players-remaining>
+                    —
+                </strong>
+
+            </div>
+
+
+            <div
+                class="live-player-list"
+                data-player-list
+            ></div>
+
+        </aside>
+
+    </section>
+
+
+    <section class="clock-info-grid">
+
+        <article>
+
+            <span>
+                PLAYERS LEFT
+            </span>
+
+            <strong>
+                <span data-players-remaining-small>
+                    —
+                </span>
+
+                <small>
+                    /
+                    {{ tournament.player_count }}
+                </small>
+            </strong>
+
+        </article>
+
+
+        <article>
+
+            <span>
+                PRIZE POOL
+            </span>
+
+            <strong>
+                {{ tournament.regular_prize_pool }}
+                <small>KR</small>
+            </strong>
+
+        </article>
+
+
+        <article>
+
+            <span>
+                BOUNTY POOL
+            </span>
+
+            <strong>
+                {{ tournament.bounty_pool }}
+                <small>KR</small>
+            </strong>
+
+        </article>
+
+
+        <article>
+
+            <span>
+                STARTING STACK
+            </span>
+
+            <strong>
+                {{
+                    "{:,}".format(
+                        tournament.structure.starting_stack
+                    ).replace(",", " ")
+                }}
+            </strong>
+
+        </article>
+
+    </section>
+
+
+    <section class="live-secondary-grid">
+
+        <article class="live-info-panel">
+
+            <div class="live-panel-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        NEXT LEVELS
+                    </p>
+
+                    <h2>
+                        Blindstruktur
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div
+                class="live-level-list"
+                data-upcoming-levels
+            ></div>
+
+        </article>
+
+
+        <article class="live-info-panel">
+
+            <div class="live-panel-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        PAYOUTS
+                    </p>
+
+                    <h2>
+                        Priser
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div
+                class="live-payout-list"
+                data-payout-list
+            ></div>
+
+        </article>
+
+
+        <article class="live-info-panel">
+
+            <div class="live-panel-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        EVENT LOG
+                    </p>
+
+                    <h2>
+                        Händelser
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div
+                class="live-event-list"
+                data-event-list
+            ></div>
+
+        </article>
+
+    </section>
+
+
+    <div
+        class="clock-error"
+        data-clock-error
+        hidden
+    ></div>
+
+
+    <dialog
+        class="elimination-dialog"
+        data-elimination-dialog
+    >
+
+        <form
+            method="dialog"
+            class="elimination-dialog-card"
+        >
+
+            <p class="eyebrow">
+                ELIMINATE PLAYER
+            </p>
+
+            <h2 data-elimination-name>
+                Player
+            </h2>
+
+            <p class="elimination-dialog-copy">
+                Spelarens placering räknas automatiskt.
+            </p>
+
+
+            <div
+                class="eliminator-field"
+                data-eliminator-field
+            >
+
+                <label for="eliminator-select">
+                    Eliminated by
+                </label>
+
+                <select
+                    id="eliminator-select"
+                    data-eliminator-select
+                ></select>
+
+            </div>
+
+
+            <div class="elimination-dialog-actions">
+
+                <button
+                    class="button button-secondary"
+                    type="button"
+                    data-cancel-elimination
+                >
+                    Avbryt
+                </button>
+
+                <button
+                    class="button button-primary"
+                    type="button"
+                    data-confirm-elimination
+                >
+                    Confirm elimination
+                </button>
+
+            </div>
+
+        </form>
+
+    </dialog>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script
+    src="{{ url_for('static', filename='js/clock.js') }}"
+    defer
+></script>
+
+{% endblock %}

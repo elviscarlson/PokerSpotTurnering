@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#050505"
+    >
+
+    <title>
+        {{ tournament.name }} · Display
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/display.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div
+    class="tournament-display"
+    data-display-app
+    data-tournament-id="{{ tournament.id }}"
+>
+
+    <header class="display-header">
+
+        <div class="display-brand">
+
+            <span class="display-brand-mark">
+                P
+            </span>
+
+            <div>
+
+                <strong>
+                    POKERSPOT
+                </strong>
+
+                <span>
+                    TOURNAMENT
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="display-title">
+
+            <span>
+                LIVE TOURNAMENT
+            </span>
+
+            <strong>
+                {{ tournament.name }}
+            </strong>
+
+        </div>
+
+
+        <div class="display-header-actions">
+
+            <button
+                class="display-icon-button"
+                type="button"
+                data-sound-toggle
+                aria-label="Slå av eller på ljud"
+            >
+                SOUND ON
+            </button>
+
+            <button
+                class="display-fullscreen-button"
+                type="button"
+                data-fullscreen
+            >
+                ENTER FULLSCREEN
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="display-main">
+
+        <section class="display-clock">
+
+            <div class="display-level">
+
+                <span>
+                    LEVEL
+                </span>
+
+                <strong data-display-level>
+                    —
+                </strong>
+
+            </div>
+
+
+            <div
+                class="display-timer"
+                data-display-timer
+            >
+                --:--
+            </div>
+
+
+            <div class="display-blinds">
+
+                <span>
+                    BLINDS
+                </span>
+
+                <strong>
+                    <span data-display-small>—</span>
+                    <i>/</i>
+                    <span data-display-big>—</span>
+                </strong>
+
+            </div>
+
+
+            <div class="display-next">
+
+                <span>
+                    NEXT
+                </span>
+
+                <strong data-display-next>
+                    —
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <section class="display-stats">
+
+            <article>
+
+                <span>
+                    PLAYERS
+                </span>
+
+                <strong>
+                    <span data-display-remaining>
+                        —
+                    </span>
+
+                    <small>
+                        /
+                        {{ tournament.player_count }}
+                    </small>
+                </strong>
+
+            </article>
+
+
+            <article>
+
+                <span>
+                    PRIZE POOL
+                </span>
+
+                <strong>
+                    {{ tournament.regular_prize_pool }}
+
+                    <small>
+                        KR
+                    </small>
+                </strong>
+
+            </article>
+
+
+            <article>
+
+                <span>
+                    STATUS
+                </span>
+
+                <strong
+                    class="display-status"
+                    data-display-status
+                >
+                    {{ tournament.status }}
+                </strong>
+
+            </article>
+
+        </section>
+
+
+        <section class="display-bottom">
+
+            <div class="display-payouts">
+
+                <div class="display-section-heading">
+
+                    <span>
+                        PAYOUTS
+                    </span>
+
+                </div>
+
+                <div
+                    class="display-payout-grid"
+                    data-display-payouts
+                ></div>
+
+            </div>
+
+
+            <div class="display-progress">
+
+                <div class="display-section-heading">
+
+                    <span>
+                        TOURNAMENT
+                    </span>
+
+                </div>
+
+                <div class="display-progress-content">
+
+                    <strong data-display-progress-title>
+                        IN PLAY
+                    </strong>
+
+                    <span data-display-progress-copy>
+                        Tournament active
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <div
+        class="display-announcement"
+        data-announcement
+        hidden
+    >
+
+        <span data-announcement-eyebrow>
+            TOURNAMENT
+        </span>
+
+        <strong data-announcement-title>
+            LEVEL UP
+        </strong>
+
+        <p data-announcement-copy></p>
+
+    </div>
+
+
+    <div
+        class="display-connection"
+        data-display-error
+        hidden
+    >
+        CONNECTION LOST
+    </div>
+
+</div>
+
+
+<script
+    src="{{ url_for('static', filename='js/display.js') }}"
+    defer
+></script>
+
+</body>
+</html>

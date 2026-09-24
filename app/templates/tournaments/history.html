@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}
+Turneringar · PokerSpot
+{% endblock %}
+
+{% block head %}
+
+<link
+    rel="stylesheet"
+    href="{{
+        url_for(
+            'static',
+            filename='css/statistics.css'
+        )
+    }}"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="history-header">
+
+    <div>
+
+        <p class="eyebrow">
+            TOURNAMENT HISTORY
+        </p>
+
+        <h1>
+            Turneringar
+        </h1>
+
+        <p>
+            Pågående turneringar och permanenta resultat
+            från tidigare pokerkvällar.
+        </p>
+
+    </div>
+
+
+    <a
+        class="button button-primary"
+        href="{{
+            url_for(
+                'tournaments.new_tournament'
+            )
+        }}"
+    >
+        New Tournament
+    </a>
+
+</section>
+
+
+<div class="history-list">
+
+    {% for tournament in tournaments %}
+
+        <article class="history-card">
+
+            <div class="history-date">
+
+                <span>
+                    {{
+                        tournament
+                        .tournament_date
+                        .strftime('%d')
+                    }}
+                </span>
+
+                <strong>
+                    {{
+                        tournament
+                        .tournament_date
+                        .strftime('%b')
+                        |upper
+                    }}
+                </strong>
+
+                <small>
+                    {{
+                        tournament
+                        .tournament_date
+                        .strftime('%Y')
+                    }}
+                </small>
+
+            </div>
+
+
+            <div class="history-main">
+
+                <div class="history-title-line">
+
+                    <h2>
+                        {{ tournament.name }}
+                    </h2>
+
+                    <span
+                        class="
+                            history-status
+                            history-status-{{
+                                tournament.status
+                                |lower
+                            }}
+                        "
+                    >
+                        {{ tournament.status }}
+                    </span>
+
+                </div>
+
+
+                <div class="history-meta">
+
+                    <span>
+                        {{
+                            tournament.player_count
+                        }}
+                        players
+                    </span>
+
+                    <span>
+                        {{
+                            tournament.buy_in
+                        }}
+                        kr buy-in
+                    </span>
+
+                    <span>
+                        {{
+                            tournament
+                            .regular_prize_pool
+                        }}
+                        kr prize pool
+                    </span>
+
+                    {% if
+                        tournament.bounty_enabled
+                    %}
+
+                        <span>
+                            {{
+                                tournament.bounty_amount
+                            }}
+                            kr bounty
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if
+                    tournament.status
+                    == "COMPLETED"
+                %}
+
+                    <div class="history-result-line">
+
+                        <span>
+                            WINNER
+                        </span>
+
+                        <strong>
+                            {% if tournament.winner %}
+                                {{
+                                    tournament
+                                    .winner
+                                    .player
+                                    .name
+                                }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </strong>
+
+
+                        {% if
+                            tournament.result
+                            and tournament.result
+                            .duration_seconds
+                            is not none
+                        %}
+
+                            <small>
+                                {{
+                                    tournament
+                                    .result
+                                    .duration_seconds
+                                    // 3600
+                                }}h
+                                {{
+                                    (
+                                        tournament
+                                        .result
+                                        .duration_seconds
+                                        % 3600
+                                    )
+                                    // 60
+                                }}m
+                            </small>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="history-action">
+
+                {% if
+                    tournament.status
+                    == "COMPLETED"
+                %}
+
+                    <a
+                        class="button button-secondary"
+                        href="{{
+                            url_for(
+                                'tournaments.result',
+                                tournament_id=(
+                                    tournament.id
+                                )
+                            )
+                        }}"
+                    >
+                        Results
+                    </a>
+
+                {% elif
+                    tournament.status
+                    == "DRAFT"
+                %}
+
+                    <a
+                        class="button button-secondary"
+                        href="{{
+                            url_for(
+                                'tournaments.setup',
+                                tournament_id=(
+                                    tournament.id
+                                )
+                            )
+                        }}"
+                    >
+                        Continue setup
+                    </a>
+
+                {% else %}
+
+                    <a
+                        class="button button-secondary"
+                        href="{{
+                            url_for(
+                                'tournaments.admin',
+                                tournament_id=(
+                                    tournament.id
+                                )
+                            )
+                        }}"
+                    >
+                        Open tournament
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </article>
+
+    {% else %}
+
+        <div class="history-empty">
+
+            <span>
+                NO TOURNAMENTS
+            </span>
+
+            <h2>
+                Ingen turnering ännu.
+            </h2>
+
+            <p>
+                Skapa den första turneringen så börjar
+                historiken byggas automatiskt.
+            </p>
+
+            <a
+                class="button button-primary"
+                href="{{
+                    url_for(
+                        'tournaments.new_tournament'
+                    )
+                }}"
+            >
+                Create Tournament
+            </a>
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

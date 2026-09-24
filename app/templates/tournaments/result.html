@@ -1,0 +1,480 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ tournament.name }} · Resultat
+{% endblock %}
+
+{% block head %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/results.css') }}"
+>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="result-hero">
+
+    <div class="result-status">
+        <span class="result-status-dot"></span>
+        TOURNAMENT COMPLETED
+    </div>
+
+    <p class="eyebrow">
+        FINAL RESULTS
+    </p>
+
+    <h1>
+        {{ tournament.name }}
+    </h1>
+
+
+    {% if tournament.winner %}
+
+        <div class="winner-block">
+
+            <span class="winner-label">
+                WINNER
+            </span>
+
+            <strong>
+                {{ tournament.winner.player.name }}
+            </strong>
+
+            <p>
+                {{
+                    tournament.winner.total_winnings
+                }}
+                kr totalt
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<section class="result-summary">
+
+    <article>
+
+        <span>
+            PLAYERS
+        </span>
+
+        <strong>
+            {{ tournament.player_count }}
+        </strong>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            TOTAL BUY-IN
+        </span>
+
+        <strong>
+            {{ tournament.total_buyins }}
+            <small>KR</small>
+        </strong>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            PRIZE POOL
+        </span>
+
+        <strong>
+            {{ tournament.regular_prize_pool }}
+            <small>KR</small>
+        </strong>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            DURATION
+        </span>
+
+        <strong>
+            {{
+                tournament.result.duration_seconds
+                // 3600
+            }}h
+            {{
+                (
+                    tournament.result.duration_seconds
+                    % 3600
+                )
+                // 60
+            }}m
+        </strong>
+
+    </article>
+
+</section>
+
+
+<section class="result-layout">
+
+    <article class="result-panel standings-panel">
+
+        <div class="result-panel-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    FINAL STANDINGS
+                </p>
+
+                <h2>
+                    Resultat
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="standings-list">
+
+            {% for entry in standings %}
+
+                <div
+                    class="
+                        standing-row
+                        {% if entry.placement == 1 %}
+                            standing-row-winner
+                        {% endif %}
+                    "
+                >
+
+                    <div class="standing-place">
+
+                        {% if entry.placement == 1 %}
+                            <span class="winner-crown">
+                                W
+                            </span>
+                        {% else %}
+                            <span>
+                                {{ entry.placement }}
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="standing-player">
+
+                        <strong>
+                            {{ entry.player.name }}
+                        </strong>
+
+                        <span>
+                            {% if entry.placement == 1 %}
+                                Winner
+                            {% else %}
+                                {{ entry.placement }}:e plats
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+
+                    <div class="standing-money">
+
+                        {% if entry.prize_winnings > 0 %}
+
+                            <strong>
+                                {{ entry.prize_winnings }}
+                                KR
+                            </strong>
+
+                            <span>
+                                prize
+                            </span>
+
+                        {% else %}
+
+                            <strong class="standing-zero">
+                                —
+                            </strong>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="standing-total">
+
+                        {% if entry.total_winnings > 0 %}
+
+                            <strong>
+                                {{ entry.total_winnings }}
+                                KR
+                            </strong>
+
+                            <span>
+                                total
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </article>
+
+
+    <div class="result-side">
+
+        <article class="result-panel">
+
+            <div class="result-panel-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        BOUNTIES
+                    </p>
+
+                    <h2>
+                        Bounty board
+                    </h2>
+
+                </div>
+
+                <span>
+                    {{ tournament.total_bounty_winnings }}
+                    KR
+                </span>
+
+            </div>
+
+
+            {% if tournament.bounty_enabled %}
+
+                <div class="bounty-result-list">
+
+                    {% for entry in bounty_leaders %}
+
+                        <div class="bounty-result-row">
+
+                            <div>
+
+                                <strong>
+                                    {{ entry.player.name }}
+                                </strong>
+
+                                <span>
+                                    {{
+                                        entry.bounty_winnings
+                                        // tournament.bounty_amount
+                                    }}
+                                    bounties
+                                </span>
+
+                            </div>
+
+                            <strong>
+                                {{ entry.bounty_winnings }}
+                                KR
+                            </strong>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="result-check">
+
+                    <span>
+                        DISTRIBUTED
+                    </span>
+
+                    <strong>
+                        {{ tournament.total_bounty_winnings }}
+                        /
+                        {{ tournament.bounty_pool }}
+                        KR
+                    </strong>
+
+                </div>
+
+            {% else %}
+
+                <div class="result-empty">
+                    Bounty var inte aktiverat i denna turnering.
+                </div>
+
+            {% endif %}
+
+        </article>
+
+
+        <article class="result-panel result-accounting">
+
+            <div class="result-panel-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        ACCOUNTING
+                    </p>
+
+                    <h2>
+                        Summering
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="accounting-row">
+
+                <span>
+                    Total buy-in
+                </span>
+
+                <strong>
+                    {{ tournament.total_buyins }}
+                    KR
+                </strong>
+
+            </div>
+
+
+            <div class="accounting-row">
+
+                <span>
+                    Prize payouts
+                </span>
+
+                <strong>
+                    {{ tournament.total_prizes }}
+                    KR
+                </strong>
+
+            </div>
+
+
+            {% if tournament.bounty_enabled %}
+
+                <div class="accounting-row">
+
+                    <span>
+                        Bounty payouts
+                    </span>
+
+                    <strong>
+                        {{ tournament.total_bounty_winnings }}
+                        KR
+                    </strong>
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="accounting-row accounting-total">
+
+                <span>
+                    Accounted
+                </span>
+
+                <strong>
+                    {{
+                        tournament.total_prizes
+                        + tournament.total_bounty_winnings
+                    }}
+                    KR
+                </strong>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+<section class="result-actions">
+
+    <div>
+
+        <strong>
+            Tournament saved
+        </strong>
+
+        <span>
+            Resultatet används senare för historik och spelarstatistik.
+        </span>
+
+    </div>
+
+
+    <div class="result-action-buttons">
+
+        <form
+            action="{{
+                url_for(
+                    'tournaments.undo_last_result',
+                    tournament_id=tournament.id
+                )
+            }}"
+            method="post"
+        >
+            <button
+                class="button button-secondary"
+                type="submit"
+            >
+                Ångra sista elimineringen
+            </button>
+        </form>
+
+        <a
+            class="button button-secondary"
+            href="{{
+                url_for(
+                    'tournaments.list_tournaments'
+                )
+            }}"
+        >
+            Turneringar
+        </a>
+
+        <a
+            class="button button-primary"
+            href="{{
+                url_for(
+                    'tournaments.new_tournament'
+                )
+            }}"
+        >
+            Ny turnering
+        </a>
+
+    </div>
+
+</section>
+
+{% endblock %}
