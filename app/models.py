@@ -218,11 +218,20 @@ class Tournament(db.Model):
         )
 
     @property
+    def total_entries(self) -> int:
+        return sum(
+            entry.buy_in_count
+            for entry in self.players
+        )
+
+
+    @property
     def total_buyins(self) -> int:
         return (
-            self.player_count
+            self.total_entries
             * self.buy_in
         )
+
 
     @property
     def bounty_pool(self) -> int:
@@ -230,9 +239,10 @@ class Tournament(db.Model):
             return 0
 
         return (
-            self.player_count
+            self.total_entries
             * self.bounty_amount
         )
+
 
     @property
     def regular_prize_pool(self) -> int:
@@ -298,6 +308,18 @@ class TournamentPlayer(db.Model):
         default="ACTIVE",
     )
 
+    buy_in_count = db.Column(
+        db.Integer,
+        nullable=False,
+        default=1,
+    )
+
+    elimination_count = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0,
+    )
+
     placement = db.Column(
         db.Integer,
         nullable=True,
@@ -338,12 +360,12 @@ class TournamentPlayer(db.Model):
         lazy="selectin",
     )
 
-    elimination_bounty = db.relationship(
+    elimination_bounties = db.relationship(
         "Bounty",
         foreign_keys="Bounty.eliminated_entry_id",
         back_populates="eliminated_entry",
-        uselist=False,
         lazy="selectin",
+        order_by="Bounty.elimination_number",
     )
 
     __table_args__ = (
@@ -491,7 +513,7 @@ class TournamentStructure(db.Model):
     def total_chips(self) -> int:
         return (
             self.starting_stack
-            * self.tournament.player_count
+            * self.tournament.total_entries
         )
 
 
@@ -722,8 +744,13 @@ class Bounty(db.Model):
             ondelete="CASCADE",
         ),
         nullable=False,
-        unique=True,
         index=True,
+    )
+
+    elimination_number = db.Column(
+        db.Integer,
+        nullable=False,
+        default=1,
     )
 
     amount = db.Column(
@@ -751,7 +778,15 @@ class Bounty(db.Model):
     eliminated_entry = db.relationship(
         "TournamentPlayer",
         foreign_keys=[eliminated_entry_id],
-        back_populates="elimination_bounty",
+        back_populates="elimination_bounties",
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "eliminated_entry_id",
+            "elimination_number",
+            name="uq_bounty_elimination",
+        ),
     )
 
 
@@ -795,3 +830,6 @@ class TournamentEvent(db.Model):
         "Tournament",
         back_populates="events",
     )
+
+
+

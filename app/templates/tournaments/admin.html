@@ -291,12 +291,13 @@
             </span>
 
             <strong>
-                {{ tournament.regular_prize_pool }}
+                <span data-prize-pool>
+                    {{ tournament.regular_prize_pool }}
+                </span>
                 <small>KR</small>
             </strong>
 
         </article>
-
 
         <article>
 
@@ -305,7 +306,9 @@
             </span>
 
             <strong>
-                {{ tournament.bounty_pool }}
+                <span data-bounty-pool>
+                    {{ tournament.bounty_pool }}
+                </span>
                 <small>KR</small>
             </strong>
 

@@ -62,6 +62,26 @@ document.addEventListener(
                 "[data-players-remaining]"
             );
 
+        const prizePoolElement =
+            app.querySelector(
+                "[data-prize-pool]"
+            );
+
+        const bountyPoolElement =
+            app.querySelector(
+                "[data-bounty-pool]"
+            );
+
+        const totalBuyinsElement =
+            app.querySelector(
+                "[data-total-buyins]"
+            );
+
+        const totalEntriesElement =
+            app.querySelector(
+                "[data-total-entries]"
+            );
+
         const playersRemainingSmall =
             app.querySelector(
                 "[data-players-remaining-small]"
@@ -139,9 +159,7 @@ document.addEventListener(
             const value =
                 Math.max(
                     0,
-                    Math.floor(
-                        seconds
-                    )
+                    Math.floor(seconds)
                 );
 
             const minutes =
@@ -381,36 +399,98 @@ document.addEventListener(
 
                         </div>
 
-                        ${
-                            state.status
-                            === "COMPLETED"
-                                ? ""
-                                : `
-                                    <button
-                                        class="restore-button"
-                                        type="button"
-                                    >
-                                        Undo
-                                    </button>
-                                `
-                        }
+                        <div class="player-row-actions">
+
+                            ${
+                                (
+                                    state.status
+                                    === "RUNNING"
+                                    ||
+                                    state.status
+                                    === "PAUSED"
+                                )
+                                    ? `
+                                        <button
+                                            class="restore-button reentry-button"
+                                            type="button"
+                                        >
+                                            Re-entry
+                                        </button>
+                                    `
+                                    : ""
+                            }
+
+                            ${
+                                state.status
+                                === "COMPLETED"
+                                    ? ""
+                                    : `
+                                        <button
+                                            class="restore-button undo-elimination-button"
+                                            type="button"
+                                        >
+                                            Undo
+                                        </button>
+                                    `
+                            }
+
+                        </div>
                     `;
 
 
-                    const button =
+                    const reentryButton =
                         row.querySelector(
-                            ".restore-button"
+                            ".reentry-button"
                         );
 
-                    if (button) {
-                        button.addEventListener(
-                            "click",
-                            () => {
-                                restorePlayer(
-                                    player
-                                );
-                            }
+                    if (
+                        reentryButton
+                    ) {
+                        reentryButton
+                            .addEventListener(
+                                "click",
+                                async () => {
+                                    const confirmed =
+                                        window.confirm(
+                                            (
+                                                `Registrera ett nytt inköp för `
+                                                +
+                                                `${player.name}?`
+                                            )
+                                        );
+
+                                    if (
+                                        !confirmed
+                                    ) {
+                                        return;
+                                    }
+
+                                    await reenterPlayer(
+                                        player,
+                                        reentryButton
+                                    );
+                                }
+                            );
+                    }
+
+
+                    const undoButton =
+                        row.querySelector(
+                            ".undo-elimination-button"
                         );
+
+                    if (
+                        undoButton
+                    ) {
+                        undoButton
+                            .addEventListener(
+                                "click",
+                                () => {
+                                    restorePlayer(
+                                        player
+                                    );
+                                }
+                            );
                     }
 
 
@@ -601,6 +681,37 @@ document.addEventListener(
             state =
                 newState;
 
+            if (
+                prizePoolElement
+            ) {
+                prizePoolElement.textContent =
+                    `${state.prize_pool}`;
+            }
+
+
+            if (
+                bountyPoolElement
+            ) {
+                bountyPoolElement.textContent =
+                    `${state.bounty_pool}`;
+            }
+
+
+            if (
+                totalBuyinsElement
+            ) {
+                totalBuyinsElement.textContent =
+                    `${state.total_buyins} KR`;
+            }
+
+
+            if (
+                totalEntriesElement
+            ) {
+                totalEntriesElement.textContent =
+                    state.total_entries;
+            }
+
             localRemaining =
                 Number(
                     state.remaining_seconds
@@ -633,13 +744,17 @@ document.addEventListener(
                 (
                     `${state.players_remaining}`
                     +
-                    `/`
+                    "/"
                     +
                     `${state.players_total}`
                 );
 
-            playersRemainingSmall.textContent =
-                state.players_remaining;
+            if (
+                playersRemainingSmall
+            ) {
+                playersRemainingSmall.textContent =
+                    state.players_remaining;
+            }
 
 
             if (
@@ -662,15 +777,10 @@ document.addEventListener(
 
 
             renderPlayers();
-
             renderUpcomingLevels();
-
             renderPayouts();
-
             renderEvents();
-
             updateControls();
-
             handleCompletion();
         }
 
@@ -862,6 +972,55 @@ document.addEventListener(
                 ),
                 options
             );
+        }
+
+
+        async function reenterPlayer(
+            player,
+            button
+        ) {
+            button.disabled =
+                true;
+
+            const oldText =
+                button.textContent;
+
+            button.textContent =
+                "Adding...";
+
+            try {
+                await apiRequest(
+                    (
+                        `/api/tournaments/`
+                        +
+                        `${tournamentId}`
+                        +
+                        `/players/`
+                        +
+                        `${player.entry_id}`
+                        +
+                        `/reentry`
+                    ),
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Accept":
+                                "application/json",
+                        },
+                    }
+                );
+            } catch (error) {
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    oldText;
+
+                showError(
+                    error.message
+                );
+            }
         }
 
 

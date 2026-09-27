@@ -752,6 +752,12 @@ def serialize_clock_state(
         "players_remaining": (
             tournament.active_player_count
         ),
+        "total_entries": (
+            tournament.total_entries
+        ),
+        "total_buyins": (
+            tournament.total_buyins
+        ),
         "players": player_data,
         "payouts": payouts,
         "upcoming_levels": upcoming_levels,

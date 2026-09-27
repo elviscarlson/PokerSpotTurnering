@@ -102,7 +102,10 @@ def calculate_player_statistics(
     )
 
     total_buyins = sum(
-        entry.tournament.buy_in
+        (
+            entry.tournament.buy_in
+            * entry.buy_in_count
+        )
         for entry in entries
     )
 

@@ -74,6 +74,44 @@ def add_event(
     return event
 
 
+def ordinal(
+    number: int,
+) -> str:
+    if 10 <= number % 100 <= 20:
+        suffix = "th"
+    else:
+        suffix = {
+            1: "st",
+            2: "nd",
+            3: "rd",
+        }.get(
+            number % 10,
+            "th",
+        )
+
+    return (
+        f"{number}{suffix}"
+    )
+
+
+def get_bounty_for_elimination(
+    *,
+    entry: TournamentPlayer,
+    elimination_number: int,
+) -> Bounty | None:
+    return next(
+        (
+            bounty
+            for bounty in entry.elimination_bounties
+            if (
+                bounty.elimination_number
+                == elimination_number
+            )
+        ),
+        None,
+    )
+
+
 def eliminate_player(
     *,
     tournament: Tournament,
@@ -138,6 +176,9 @@ def eliminate_player(
             )
 
     entry.status = "ELIMINATED"
+
+    entry.elimination_count += 1
+
     entry.placement = placement
 
     prize = get_prize_for_place(
@@ -156,7 +197,7 @@ def eliminate_player(
         event_type="PLAYER_ELIMINATED",
         message=(
             f"{entry.player.name} eliminated — "
-            f"{placement}th"
+            f"{ordinal(placement)}"
         ),
     )
 
@@ -168,7 +209,12 @@ def eliminate_player(
             tournament=tournament,
             winner_entry=eliminator,
             eliminated_entry=entry,
-            amount=tournament.bounty_amount,
+            elimination_number=(
+                entry.elimination_count
+            ),
+            amount=(
+                tournament.bounty_amount
+            ),
         )
 
         eliminator.bounty_winnings += (
@@ -185,11 +231,16 @@ def eliminate_player(
             message=(
                 f"{eliminator.player.name} received "
                 f"{entry.player.name}'s bounty "
-                f"({tournament.bounty_amount} kr)"
+                f"({tournament.bounty_amount} kr) "
+                f"— elimination "
+                f"#{entry.elimination_count}"
             ),
         )
 
-    if tournament.active_player_count == 1:
+    if (
+        tournament.active_player_count
+        == 1
+    ):
         complete_tournament(
             tournament,
             now=now,
@@ -220,8 +271,10 @@ def restore_last_elimination(
         candidate
         for candidate in tournament.players
         if (
-            candidate.status == "ELIMINATED"
-            and candidate.placement is not None
+            candidate.status
+            == "ELIMINATED"
+            and candidate.placement
+            is not None
         )
     ]
 
@@ -232,7 +285,8 @@ def restore_last_elimination(
 
     most_recent = min(
         eliminated_entries,
-        key=lambda candidate: candidate.placement,
+        key=lambda candidate:
+            candidate.placement,
     )
 
     if most_recent.id != entry.id:
@@ -240,16 +294,34 @@ def restore_last_elimination(
             "Endast den senaste elimineringen kan ångras."
         )
 
+    if entry.elimination_count <= 0:
+        raise EliminationError(
+            "Spelaren saknar en registrerad eliminering att återställa."
+        )
+
+    elimination_number = (
+        entry.elimination_count
+    )
+
     if tournament.status == "COMPLETED":
         reopen_completed_tournament(
             tournament,
             now=now,
         )
 
-    bounty = entry.elimination_bounty
+    bounty = (
+        get_bounty_for_elimination(
+            entry=entry,
+            elimination_number=(
+                elimination_number
+            ),
+        )
+    )
 
     if bounty is not None:
-        winner = bounty.winner_entry
+        winner = (
+            bounty.winner_entry
+        )
 
         winner.bounty_winnings = max(
             0,
@@ -264,14 +336,20 @@ def restore_last_elimination(
     name = entry.player.name
 
     entry.status = "ACTIVE"
+
     entry.placement = None
+
     entry.prize_winnings = 0
+
+    entry.elimination_count -= 1
 
     add_event(
         tournament=tournament,
         event_type="ELIMINATION_RESTORED",
         message=(
-            f"{name} restored to tournament"
+            f"{name} restored to tournament "
+            f"(elimination "
+            f"#{elimination_number} undone)"
         ),
     )
 

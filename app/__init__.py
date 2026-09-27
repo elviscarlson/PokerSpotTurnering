@@ -62,8 +62,9 @@ def register_blueprints(
 ) -> None:
     from .routes.api import api_bp
     from .routes.main import main_bp
-    from .routes.players import (
-        players_bp,
+    from .routes.players import players_bp
+    from .routes.reentry_api import (
+        reentry_api_bp,
     )
     from .routes.tournaments import (
         tournaments_bp,
@@ -83,6 +84,10 @@ def register_blueprints(
 
     app.register_blueprint(
         api_bp
+    )
+
+    app.register_blueprint(
+        reentry_api_bp
     )
 
 

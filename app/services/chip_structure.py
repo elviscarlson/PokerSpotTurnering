@@ -25,40 +25,21 @@ class ChipAllocation:
 
 
 def suggest_starting_stack(
-    *,
     number_of_players: int,
     target_duration_minutes: int,
 ) -> int:
-    """
-    Suggest a practical starting stack.
-
-    Longer tournaments receive deeper stacks.
-    Larger fields get a small additional depth adjustment.
-    """
-    if number_of_players < 2:
-        raise ValueError(
-            "At least two players are required."
-        )
-
-    if target_duration_minutes <= 0:
-        raise ValueError(
-            "Target duration must be greater than zero."
-        )
-
-    if target_duration_minutes <= 180:
-        stack = 10_000
-    elif target_duration_minutes <= 270:
-        stack = 15_000
-    elif target_duration_minutes <= 360:
-        stack = 20_000
+    if target_duration_minutes <= 300:
+        stack = 5_000
+    elif target_duration_minutes <= 420:
+        stack = 6_000
     else:
-        stack = 25_000
+        stack = 7_000
 
     if (
         number_of_players >= 12
         and target_duration_minutes >= 240
     ):
-        stack += 5_000
+        stack += 1_000
 
     return stack
 
