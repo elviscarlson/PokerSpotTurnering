@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>PokerSpot – pokermarker med spader</title>
+  <circle cx="32" cy="32" r="31" fill="#141719"/>
+  <circle cx="32" cy="32" r="28" fill="#ff3047"/>
+  <circle cx="32" cy="32" r="25" fill="none" stroke="#f7f5ef" stroke-width="3" stroke-dasharray="6 13.635"/>
+  <circle cx="32" cy="32" r="21" fill="#cf1930"/>
+  <path fill="#f7f5ef" d="M32 15C28 22 18 25 18 33C18 41 26 44 31 38C30 43 27 46 25 48H39C37 46 34 43 33 38C38 44 46 41 46 33C46 25 36 22 32 15Z"/>
+</svg>
