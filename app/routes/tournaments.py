@@ -21,7 +21,7 @@ from app.models import Player, Tournament
 from app.services.clock_service import (
     ensure_runtime,
 )
-from app.services.late_registration import register_late_player
+from app.services.late_registration import available_registration_players, register_late_player
 from app.services.buyin_undo import clear_buyin_history
 from app.services.player_elimination import (
     EliminationError,
@@ -474,12 +474,7 @@ def admin(
     return render_template(
         "tournaments/admin.html",
         tournament=tournament,
-        available_players=db.session.scalars(
-            select(Player).where(
-                Player.is_active.is_(True),
-                ~Player.id.in_([entry.player_id for entry in tournament.players]),
-            ).order_by(Player.name.asc())
-        ).all(),
+        available_players=available_registration_players(tournament),
     )
 
 

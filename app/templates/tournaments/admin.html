@@ -13,7 +13,7 @@
 
 <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/clock.css') }}"
+    href="{{ url_for('static', filename='css/clock.css', v='registration2') }}"
 >
 
 {% endblock %}
@@ -281,12 +281,16 @@
                     Antalet betalda platser behålls och prissummorna räknas upp.
                 </p>
                 <label for="late-player-id">Befintlig spelare</label>
-                <select id="late-player-id" name="player_id">
+                <select id="late-player-id" name="player_id" aria-describedby="late-player-empty" {% if not available_players %}disabled{% endif %}>
                     <option value="">Välj spelare</option>
                     {% for player in available_players %}
                         <option value="{{ player.id }}">{{ player.name }}</option>
                     {% endfor %}
                 </select>
+                <p id="late-player-empty" data-registration-empty {% if available_players %}hidden{% endif %}>
+                    Det finns inga aktiva spelare att lägga till från spelarregistret.
+                    Spelare som redan är med i turneringen använder Återinköp.
+                </p>
                 <label for="late-player-name">Eller nytt spelarnamn</label>
                 <input id="late-player-name" name="new_player_name" maxlength="80" autocomplete="off">
                 <button class="button button-primary" type="submit">Registrera inköp</button>
@@ -542,7 +546,7 @@
 {% block scripts %}
 
 <script
-    src="{{ url_for('static', filename='js/clock.js') }}"
+    src="{{ url_for('static', filename='js/clock.js', v='registration2') }}"
     defer
 ></script>
 

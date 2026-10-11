@@ -710,10 +710,26 @@ document.addEventListener(
             if (registrationForm) {
                 registrationForm.hidden = !["READY", "RUNNING", "PAUSED"].includes(state.status);
                 const playerSelect = registrationForm.querySelector("[name=player_id]");
-                for (const option of Array.from(playerSelect.options)) {
-                    if (option.value && state.players.some(player => String(player.player_id) === option.value)) {
-                        option.remove();
+                const candidates = state.registration_candidates;
+                if (Array.isArray(candidates)) {
+                    // Keep the current selection and avoid rebuilding an open dropdown
+                    // on every clock poll when the register has not changed.
+                    const options = Array.from(playerSelect.options).filter(option => option.value);
+                    const unchanged = options.length === candidates.length && options.every((option, index) =>
+                        option.value === String(candidates[index].player_id) && option.textContent === candidates[index].name
+                    );
+                    if (!unchanged) {
+                        const selected = playerSelect.value;
+                        const fragment = document.createDocumentFragment();
+                        fragment.append(new Option("Välj spelare", ""));
+                        for (const player of candidates) {
+                            fragment.append(new Option(player.name, String(player.player_id)));
+                        }
+                        playerSelect.replaceChildren(fragment);
+                        playerSelect.value = candidates.some(player => String(player.player_id) === selected) ? selected : "";
                     }
+                    playerSelect.disabled = candidates.length === 0;
+                    registrationForm.querySelector("[data-registration-empty]").hidden = candidates.length > 0;
                 }
             }
 

@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from app.extensions import db
 from app.models import Player, Prize, Tournament
 from app.services.clock_service import pause_clock, start_clock
+from app.services.buyin_undo import undo_last_buyin
 from app.services.late_registration import LateRegistrationError, register_late_player
 from app.services.player_elimination import eliminate_player, restore_last_elimination
 from app.services.reentry_service import register_reentry
@@ -165,3 +166,56 @@ def test_archived_player_cannot_join(app):
         db.session.commit()
         with pytest.raises(LateRegistrationError):
             register_late_player(tournament=tournament, player_id=reserve.id)
+
+
+@pytest.mark.parametrize("status", ["READY", "RUNNING", "PAUSED"])
+def test_available_players_are_in_initial_page_and_live_state(client, app, status):
+    with app.app_context():
+        tournament, reserve = build_game(status=status)
+        db.session.add(Player(name="Arkiverad", name_key="arkiverad", is_active=False))
+        db.session.commit()
+        tournament_id, reserve_id = tournament.id, reserve.id
+        if status != "READY":
+            eliminate_player(tournament=tournament, entry_id=tournament.players[-1].id,
+                             eliminated_by_entry_id=tournament.players[0].id)
+    page = client.get(f"/tournaments/{tournament_id}/admin").get_data(as_text=True)
+    assert f'<option value="{reserve_id}">Anton</option>' in page
+    state = client.get(f"/api/tournaments/{tournament_id}/state").get_json()
+    assert state["registration_candidates"] == [{"player_id": reserve_id, "name": "Anton"}]
+
+
+def test_live_candidates_follow_register_changes_after_page_opened(client, app):
+    with app.app_context():
+        tournament, reserve = build_game()
+        reserve.is_active = False
+        db.session.commit()
+        tournament_id = tournament.id
+    url = f"/api/tournaments/{tournament_id}/state"
+    page = client.get(f"/tournaments/{tournament_id}/admin").get_data(as_text=True)
+    assert 'aria-describedby="late-player-empty" disabled' in page
+    assert client.get(url).get_json()["registration_candidates"] == []
+    client.post("/players/", data={"name": "Ny i registret"})
+    candidates = client.get(url).get_json()["registration_candidates"]
+    assert len(candidates) == 1 and candidates[0]["name"] == "Ny i registret"
+    with app.app_context():
+        player = db.session.get(Player, candidates[0]["player_id"])
+        player.name, player.name_key = "Nytt namn", "nytt namn"
+        db.session.commit()
+    assert client.get(url).get_json()["registration_candidates"][0]["name"] == "Nytt namn"
+    with app.app_context():
+        db.session.get(Player, candidates[0]["player_id"]).is_active = False
+        db.session.commit()
+    assert client.get(url).get_json()["registration_candidates"] == []
+
+
+def test_candidate_returns_after_registration_is_undone(client, app):
+    with app.app_context():
+        tournament, reserve = build_game()
+        tournament_id, reserve_id = tournament.id, reserve.id
+    url = f"/api/tournaments/{tournament_id}/state"
+    client.post(f"/tournaments/{tournament_id}/players/add", data={"player_id": reserve_id})
+    state = client.get(url).get_json()
+    assert state["registration_candidates"] == []
+    with app.app_context():
+        undo_last_buyin(db.session.get(Tournament, tournament_id), action_id=state["undo_buyin"]["id"])
+    assert client.get(url).get_json()["registration_candidates"] == [{"player_id": reserve_id, "name": "Anton"}]

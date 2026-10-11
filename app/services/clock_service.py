@@ -5,6 +5,7 @@ from math import floor
 
 from app.extensions import db
 from app.services.buyin_undo import undo_buyin_state
+from app.services.late_registration import available_registration_players
 from app.models import (
     BlindLevel,
     Tournament,
@@ -760,6 +761,10 @@ def serialize_clock_state(
             tournament.total_buyins
         ),
         "players": player_data,
+        "registration_candidates": [
+            {"player_id": player.id, "name": player.name}
+            for player in available_registration_players(tournament)
+        ] if tournament.status in ("READY", "RUNNING", "PAUSED") else [],
         "undo_buyin": undo_buyin_state(tournament),
         "payouts": payouts,
         "upcoming_levels": upcoming_levels,

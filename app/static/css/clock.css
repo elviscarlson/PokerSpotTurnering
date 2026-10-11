@@ -860,6 +860,19 @@
     border-radius: 8px;
 }
 
+.late-registration-form select option {
+    background: var(--surface-raised);
+    color: var(--text);
+}
+
+.late-registration-form select:disabled {
+    opacity: 0.6;
+}
+
+.late-registration-form [data-registration-empty][hidden] {
+    display: none;
+}
+
 .clock-control-confirm {
     border-color:
         rgba(255, 51, 71, 0.65) !important;

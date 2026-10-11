@@ -13,6 +13,19 @@ class LateRegistrationError(ValueError):
     pass
 
 
+def available_registration_players(tournament: Tournament) -> list[Player]:
+    """Read eligible players from the current register, including new arrivals."""
+    registered_ids = select(TournamentPlayer.player_id).where(
+        TournamentPlayer.tournament_id == tournament.id
+    )
+    return db.session.scalars(
+        select(Player).where(
+            Player.is_active.is_(True),
+            Player.id.not_in(registered_ids),
+        ).order_by(Player.name.asc(), Player.id.asc())
+    ).all()
+
+
 def register_late_player(
     *,
     tournament: Tournament,
