@@ -2,6 +2,7 @@
 {% block title %}Leo · All-in · PokerSpot{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/leo.css', v='1') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css', v='3') }}">
 {% endblock %}
 {% block content %}
 <section class="leo-page" data-leo-page>
@@ -10,7 +11,15 @@
         <h1>ALL-IN<br><span>MED LEO.</span></h1>
         <p class="leo-subtitle">När någon säger ”bara en liten höjning”.</p>
         <button class="leo-button" type="button" data-leo-strike>ALL-IN! <span aria-hidden="true">♠</span></button>
+        <button class="leo-sound-toggle" type="button" data-leo-sound aria-pressed="true" aria-label="Katanaljud">Ljud på</button>
         <p class="leo-response" data-leo-response role="status" aria-live="polite">Bordet är ditt.</p>
+        <nav class="friend-links" aria-label="PokerSpot-legender">
+            <a href="{{ url_for('main.leo') }}" aria-current="page">Leo</a>
+            <a href="{{ url_for('main.elvis') }}">Elvis</a>
+            <a href="{{ url_for('main.hugo') }}">Hugo</a>
+            <a href="{{ url_for('main.olle') }}">Olle</a>
+            <a href="{{ url_for('main.elias') }}">Elias</a>
+        </nav>
         <a class="leo-back" href="{{ url_for('main.dashboard') }}">← Tillbaka till pokern</a>
     </div>
     <div class="leo-stage">
@@ -28,5 +37,5 @@
 </section>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/leo.js', v='1') }}" defer></script>
+<script src="{{ url_for('static', filename='js/leo.js', v='2') }}" defer></script>
 {% endblock %}

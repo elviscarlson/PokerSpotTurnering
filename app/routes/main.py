@@ -83,6 +83,44 @@ FRIEND_PROFILES = {
             "Han simmar lugnt. Era marker gör det inte.",
         ],
     },
+    "olle": {
+        "name": "Olle",
+        "image": "olle1.png",
+        "alternate_image": "olle2.png",
+        "alternate_alt": "Olle med spegelblanka solglasögon och maximal energi",
+        "eyebrow": "POKERSPOTS VILDA KORT",
+        "headline": "TVÅ LÄGEN.",
+        "tagline": "NOLL FOLD.",
+        "subtitle": "Korv på hjärnan. Solglasögon på. Samma orimliga självförtroende.",
+        "button": "BYT POKERFEJS!",
+        "response": "Dagens meny: en riktigt saftig pott.",
+        "badge": "BORDETS VILDA KORT",
+        "alt": "Olle i randig tröja med ett svävande korvfilter ovanför huvudet",
+        "lines": [
+            "Solglasögon på. Nu kan ingen se honom räkna fel.",
+            "Tillbaka till korvläget. Potten ska grillas.",
+            "Pokerfejs? Olle tog med hela festivalfejset.",
+            "Han har inte nötterna. Han har korvarna.",
+        ],
+    },
+    "elias": {
+        "name": "Elias",
+        "image": "elias.png",
+        "eyebrow": "POKERSPOTS BLUFFDETEKTOR",
+        "headline": "VÄNTA NU.",
+        "tagline": "JAG SYNAR.",
+        "subtitle": "Den där höjningen kommer du få förklara.",
+        "button": "SYNA BLUFFEN!",
+        "response": "Elias har redan en följdfråga.",
+        "badge": "MISSTÄNKSAM SEDAN FLOPPEN",
+        "alt": "Elias i mörk jacka, mitt i en mycket engagerad diskussion",
+        "lines": [
+            "Vänta. Du höjde med VAD sa du?",
+            "Elias synar både handen och din förklaring.",
+            "Den där bluffen behöver en bättre presentation.",
+            "Han skulle bara ställa en fråga. Nu är det korsförhör.",
+        ],
+    },
 }
 
 
@@ -94,6 +132,16 @@ def elvis():
 @main_bp.get("/hugo")
 def hugo():
     return render_template("friend.html", slug="hugo", profile=FRIEND_PROFILES["hugo"])
+
+
+@main_bp.get("/olle")
+def olle():
+    return render_template("friend.html", slug="olle", profile=FRIEND_PROFILES["olle"])
+
+
+@main_bp.get("/elias")
+def elias():
+    return render_template("friend.html", slug="elias", profile=FRIEND_PROFILES["elias"])
 
 
 @main_bp.get("/health")

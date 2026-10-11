@@ -1,5 +1,11 @@
 .friend-page { --friend-accent: #f2c664; --friend-glow: #e9af3025; }
 .friend-page--hugo { --friend-accent: #4bdeef; --friend-glow: #1bbbdc25; }
+.friend-page--olle { --friend-accent: #bb9aff; --friend-glow: #9970ff25; }
+.friend-page--olle.friend-alternate { --friend-accent: #5ee3ff; --friend-glow: #16bcdf25; }
+.friend-page--elias { --friend-accent: #b8ef75; --friend-glow: #92d83825; }
+.leo-page:not(.friend-page) .friend-links { --friend-accent: var(--accent-bright); }
+.leo-sound-toggle { display: inline-block; margin: 12px 0 0 14px; padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: transparent; color: var(--text-secondary); font-size: 12px; cursor: pointer; }
+.leo-sound-toggle:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 3px; }
 .friend-page .leo-copy h1 { font-size: clamp(44px, 6.2vw, 92px); }
 .friend-page .leo-copy h1 span, .friend-page .leo-eyebrow, .friend-page .leo-badge span { color: var(--friend-accent); }
 .friend-page .leo-button { border-color: var(--friend-accent); background: var(--friend-accent); color: #101014; box-shadow: 0 8px 35px var(--friend-glow); }
@@ -10,6 +16,10 @@
 .friend-page--hugo .friend-portrait { animation: hugo-swim 6s ease-in-out infinite; }
 .friend-image { height: min(70svh, 720px); width: 100%; object-fit: contain; }
 .friend-page--elvis .friend-image { width: min(100%, 40svh); height: auto; margin: 0 auto; border-radius: 16px; }
+.friend-page--elvis .leo-stage { padding-top: 76px; }
+.friend-page--olle .friend-image { height: min(72svh, 740px); }
+.friend-page--olle .friend-portrait { animation: olle-groove 5s ease-in-out infinite; }
+.friend-page--elias .friend-portrait { animation: elias-listen 6s ease-in-out infinite; }
 .friend-effects { position: absolute; inset: 0; pointer-events: none; }
 .friend-bubble {
     position: absolute; left: calc(8% + var(--i) * 9%); bottom: 10%;
@@ -24,7 +34,19 @@
     border: 3px dashed #f2c664; background: #211b10; color: #f2c664; font-size: 20px;
     opacity: 0; z-index: 3;
 }
-.friend-crown { position: absolute; top: 0; left: 47%; z-index: 3; color: var(--friend-accent); font-size: 60px; opacity: .6; animation: friend-float 5s ease-in-out infinite; }
+.friend-crown { position: absolute; top: 0; left: calc(50% - 30px); z-index: 3; color: var(--friend-accent); font-size: 60px; line-height: 1; opacity: .8; animation: friend-float 5s ease-in-out infinite; }
+.friend-card {
+    position: absolute; left: calc(5% + var(--i) * 16%); top: 25%; z-index: 3;
+    display: grid; place-items: center; width: 42px; height: 58px; border-radius: 7px;
+    border: 1px solid var(--friend-accent); color: var(--friend-accent); background: #171320;
+    font-size: 30px; opacity: 0;
+}
+.friend-call {
+    position: absolute; top: 12%; left: 4%; z-index: 3; opacity: 0;
+    padding: 12px 20px; border: 2px solid var(--friend-accent); border-radius: 20px 20px 4px 20px;
+    background: #182310; color: var(--friend-accent); font-size: clamp(24px, 4vw, 48px); font-weight: 900;
+}
+.friend-question { position: absolute; top: 12%; right: calc(5% + var(--i) * 14%); color: var(--friend-accent); font-size: 50px; font-weight: 900; opacity: 0; z-index: 3; }
 .friend-links { display: flex; gap: 10px; margin: 0 0 24px; flex-wrap: wrap; }
 .friend-links a { padding: 8px 14px; border: 1px solid var(--border-strong); border-radius: 20px; color: var(--text-secondary); text-decoration: none; font-size: 12px; }
 .friend-links a:hover, .friend-links a[aria-current="page"] { border-color: var(--friend-accent); color: var(--friend-accent); }
@@ -34,6 +56,11 @@
 .friend-acting.friend-page--elvis .friend-crown { animation: elvis-crown 1.15s ease-out; }
 .friend-acting.friend-page--hugo .friend-portrait { animation: hugo-dive 1.15s ease-in-out; }
 .friend-acting.friend-page--hugo .friend-ripple { animation: hugo-ripple 1.15s ease-out; }
+.friend-acting.friend-page--olle .friend-portrait { animation: olle-flip 1.15s ease-out; }
+.friend-acting.friend-page--olle .friend-card { animation: olle-cards 1.15s ease-out both; animation-delay: calc(var(--i) * .05s); }
+.friend-acting.friend-page--elias .friend-portrait { animation: elias-call 1.15s ease-out; }
+.friend-acting.friend-page--elias .friend-call { animation: elias-speech 1.4s ease-out; }
+.friend-acting.friend-page--elias .friend-question { animation: elias-questions 1.15s ease-out both; animation-delay: calc(var(--i) * .1s); }
 @keyframes friend-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes hugo-swim { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-14px) rotate(2deg); } }
 @keyframes hugo-bubble { 0% { opacity: 0; transform: translateY(0) scale(.8); } 15% { opacity: .7; } 90% { opacity: .5; } 100% { opacity: 0; transform: translateY(-400px) scale(1.2); } }
@@ -42,16 +69,31 @@
 @keyframes elvis-raise { 0%, 100% { transform: scale(1) rotate(0); } 30% { transform: scale(1.04) rotate(-2deg); } 65% { transform: scale(1.02) rotate(2deg); } }
 @keyframes elvis-chips { 0% { opacity: 0; transform: translateY(-60px) rotate(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(440px) rotate(240deg); } }
 @keyframes elvis-crown { 0%, 100% { transform: scale(1); } 35% { transform: translateY(-12px) scale(1.25) rotate(-10deg); } }
+@keyframes olle-groove { 0%, 100% { transform: rotate(-1deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
+@keyframes olle-flip { 0% { transform: scale(.94) rotate(-4deg); } 45% { transform: scale(1.03) rotate(3deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes olle-cards { 0% { opacity: 0; transform: translateY(100px) rotate(-30deg); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-160px) rotate(40deg); } }
+@keyframes elias-listen { 0%, 100% { transform: rotate(0); } 50% { transform: translateY(-8px) rotate(-1deg); } }
+@keyframes elias-call { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-12px) rotate(-2deg); } 55% { transform: translateX(8px) rotate(1deg); } }
+@keyframes elias-speech { 0% { opacity: 0; transform: scale(.7) rotate(-8deg); } 20%, 75% { opacity: 1; transform: scale(1) rotate(-8deg); } 100% { opacity: 0; transform: translateY(-15px) rotate(-8deg); } }
+@keyframes elias-questions { 0% { opacity: 0; transform: translateY(25px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-45px) rotate(15deg); } }
 @media (max-width: 850px) {
     .friend-page .leo-copy h1 { font-size: clamp(44px, 11vw, 82px); }
     .friend-links { justify-content: center; }
     .friend-image { height: auto; max-height: 600px; }
-    .friend-crown { font-size: 44px; }
+    .friend-crown { font-size: 44px; left: calc(50% - 22px); }
+    .friend-page--elvis .leo-stage { padding-top: 64px; }
+    .friend-page--olle .friend-image { height: auto; max-height: 600px; }
+    .friend-page .leo-badge { max-width: 100%; gap: 10px; font-size: 9px; letter-spacing: .12em; padding: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
     .friend-portrait, .friend-page--hugo .friend-portrait, .friend-bubble, .friend-crown,
     .friend-acting.friend-page--elvis .friend-portrait, .friend-acting.friend-page--elvis .friend-chip,
     .friend-acting.friend-page--elvis .friend-crown, .friend-acting.friend-page--hugo .friend-portrait,
-    .friend-acting.friend-page--hugo .friend-ripple { animation: none; }
+    .friend-acting.friend-page--hugo .friend-ripple,
+    .friend-page--olle .friend-portrait, .friend-page--elias .friend-portrait,
+    .friend-acting.friend-page--olle .friend-portrait, .friend-acting.friend-page--olle .friend-card,
+    .friend-acting.friend-page--elias .friend-portrait, .friend-acting.friend-page--elias .friend-call,
+    .friend-acting.friend-page--elias .friend-question { animation: none; }
     .friend-bubble { opacity: .3; }
+    .friend-acting .friend-call { opacity: 1; }
 }

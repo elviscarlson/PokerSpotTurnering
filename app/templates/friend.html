@@ -2,7 +2,10 @@
 {% block title %}{{ profile.name }} · PokerSpot{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/leo.css', v='1') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css', v='2') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css', v='3') }}">
+{% if profile.alternate_image %}
+<link rel="preload" as="image" href="{{ url_for('static', filename=profile.alternate_image, v='1') }}">
+{% endif %}
 {% endblock %}
 {% block content %}
 <section class="leo-page friend-page friend-page--{{ slug }}" data-friend-page
@@ -17,6 +20,8 @@
             <a href="{{ url_for('main.leo') }}">Leo</a>
             <a href="{{ url_for('main.elvis') }}" {% if slug == 'elvis' %}aria-current="page"{% endif %}>Elvis</a>
             <a href="{{ url_for('main.hugo') }}" {% if slug == 'hugo' %}aria-current="page"{% endif %}>Hugo</a>
+            <a href="{{ url_for('main.olle') }}" {% if slug == 'olle' %}aria-current="page"{% endif %}>Olle</a>
+            <a href="{{ url_for('main.elias') }}" {% if slug == 'elias' %}aria-current="page"{% endif %}>Elias</a>
         </nav>
         <a class="leo-back" href="{{ url_for('main.dashboard') }}">← Tillbaka till pokern</a>
     </div>
@@ -26,13 +31,19 @@
             {% if slug == 'hugo' %}
                 {% for i in range(10) %}<span class="friend-bubble" style="--i: {{ i }}"></span>{% endfor %}
                 <span class="friend-ripple"></span>
-            {% else %}
+            {% elif slug == 'elvis' %}
                 {% for i in range(9) %}<span class="friend-chip" style="--i: {{ i }}">♠</span>{% endfor %}
                 <span class="friend-crown">♛</span>
+            {% elif slug == 'olle' %}
+                {% for suit in ['♠', '♥', '♦', '♣', '♠', '♦'] %}<span class="friend-card" style="--i: {{ loop.index0 }}">{{ suit }}</span>{% endfor %}
+            {% elif slug == 'elias' %}
+                <span class="friend-call">SYN!</span>
+                {% for i in range(3) %}<span class="friend-question" style="--i: {{ i }}">?</span>{% endfor %}
             {% endif %}
         </div>
         <div class="leo-portrait friend-portrait">
             <img class="leo-image friend-image" src="{{ url_for('static', filename=profile.image, v='1') }}"
+                 {% if profile.alternate_image %}data-alternate-src="{{ url_for('static', filename=profile.alternate_image, v='1') }}" data-alternate-alt="{{ profile.alternate_alt }}"{% endif %}
                  alt="{{ profile.alt }}" fetchpriority="high">
         </div>
         <span class="leo-badge">{{ profile.name | upper }} <span>♠</span> {{ profile.badge }}</span>
@@ -40,5 +51,5 @@
 </section>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/friends.js', v='1') }}" defer></script>
+<script src="{{ url_for('static', filename='js/friends.js', v='2') }}" defer></script>
 {% endblock %}
