@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from app.extensions import db
+from app.services.buyin_undo import capture_buyin_state, record_buyin
 from app.models import (
     Prize,
     Tournament,
@@ -423,6 +424,8 @@ def register_reentry(
         entry=entry,
     )
 
+    before = capture_buyin_state(tournament)
+
     old_buy_in_count = (
         entry.buy_in_count
     )
@@ -520,6 +523,11 @@ def register_reentry(
         tournament
     )
 
+    prizes_by_place = {prize.place: prize.amount for prize in tournament.prizes}
+    for eliminated in tournament.players:
+        if eliminated.status == "ELIMINATED":
+            eliminated.prize_winnings = prizes_by_place.get(eliminated.placement, 0)
+
     if (
         tournament.total_prizes
         != tournament.regular_prize_pool
@@ -539,6 +547,7 @@ def register_reentry(
         ),
     )
 
+    record_buyin(tournament, before, entry, "REENTRY")
     db.session.commit()
 
     return entry

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from math import floor
 
 from app.extensions import db
+from app.services.buyin_undo import undo_buyin_state
 from app.models import (
     BlindLevel,
     Tournament,
@@ -759,6 +760,7 @@ def serialize_clock_state(
             tournament.total_buyins
         ),
         "players": player_data,
+        "undo_buyin": undo_buyin_state(tournament),
         "payouts": payouts,
         "upcoming_levels": upcoming_levels,
         "events": events,

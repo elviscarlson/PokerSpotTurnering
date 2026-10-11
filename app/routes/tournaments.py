@@ -1,22 +1,28 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+import secrets
 
 from flask import (
     Blueprint,
+    abort,
     flash,
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
 from app.models import Player, Tournament
 from app.services.clock_service import (
     ensure_runtime,
 )
+from app.services.late_registration import register_late_player
+from app.services.buyin_undo import clear_buyin_history
 from app.services.player_elimination import (
     EliminationError,
     restore_last_elimination,
@@ -55,6 +61,28 @@ def list_tournaments():
     return render_template(
         "tournaments/history.html",
         tournaments=tournaments,
+    )
+
+
+@tournaments_bp.route("/<int:tournament_id>/delete", methods=["GET", "POST"])
+def delete_tournament(tournament_id: int):
+    tournament = db.get_or_404(Tournament, tournament_id)
+    if request.method == "POST":
+        token = session.get("tournament_delete_token", "")
+        submitted_token = request.form.get("delete_token", "")
+        if not token or not secrets.compare_digest(token.encode(), submitted_token.encode()):
+            abort(400)
+        name = tournament.name
+        clear_buyin_history(tournament)
+        db.session.delete(tournament)
+        db.session.commit()
+        session.pop("tournament_delete_token", None)
+        flash(f"Turneringen {name} togs bort.", "success")
+        return redirect(url_for("tournaments.list_tournaments"))
+
+    token = session.setdefault("tournament_delete_token", secrets.token_urlsafe(32))
+    return render_template(
+        "tournaments/delete.html", tournament=tournament, delete_token=token,
     )
 
 
@@ -446,7 +474,34 @@ def admin(
     return render_template(
         "tournaments/admin.html",
         tournament=tournament,
+        available_players=db.session.scalars(
+            select(Player).where(
+                Player.is_active.is_(True),
+                ~Player.id.in_([entry.player_id for entry in tournament.players]),
+            ).order_by(Player.name.asc())
+        ).all(),
     )
+
+
+@tournaments_bp.post("/<int:tournament_id>/players/add")
+def add_tournament_player(tournament_id: int):
+    tournament = db.get_or_404(Tournament, tournament_id)
+    try:
+        raw_player_id = request.form.get("player_id", "").strip()
+        entry = register_late_player(
+            tournament=tournament,
+            player_id=int(raw_player_id) if raw_player_id else None,
+            name=request.form.get("new_player_name", ""),
+        )
+    except ValueError as exc:
+        db.session.rollback()
+        flash(str(exc), "error")
+    except IntegrityError:
+        db.session.rollback()
+        flash("Spelaren har redan registrerats. Uppdatera sidan och försök igen.", "error")
+    else:
+        flash(f"{entry.player.name} lades till med ett inköp på {tournament.buy_in} kr.", "success")
+    return redirect(url_for("tournaments.admin", tournament_id=tournament.id))
 
 
 @tournaments_bp.get(

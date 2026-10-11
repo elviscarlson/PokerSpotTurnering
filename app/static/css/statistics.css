@@ -751,6 +751,29 @@
 }
 
 
+.history-action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.history-delete-button {
+    color: var(--accent-bright);
+}
+
+.tournament-delete-confirmation {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.tournament-delete-confirmation form {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
 .history-empty {
     padding:
         65px

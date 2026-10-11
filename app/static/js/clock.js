@@ -209,6 +209,12 @@ document.addEventListener(
         }
 
 
+        function escapeHtml(value) {
+            const element = document.createElement("span");
+            element.textContent = value;
+            return element.innerHTML;
+        }
+
         function renderPlayers() {
             playerList.innerHTML =
                 "";
@@ -266,16 +272,16 @@ document.addEventListener(
                                 ${
                                     isWinner
                                         ? "W"
-                                        : player.name
+                                        : escapeHtml(player.name
                                             .charAt(0)
-                                            .toUpperCase()
+                                            .toUpperCase())
                                 }
                             </div>
 
                             <div>
 
                                 <strong>
-                                    ${player.name}
+                                    ${escapeHtml(player.name)}
                                 </strong>
 
                                 <span>
@@ -386,7 +392,7 @@ document.addEventListener(
                             <div>
 
                                 <strong>
-                                    ${player.name}
+                                    ${escapeHtml(player.name)}
                                 </strong>
 
                                 <span>
@@ -579,7 +585,7 @@ document.addEventListener(
                             <div class="live-event-row">
 
                                 <span>
-                                    ${event.message}
+                                    ${escapeHtml(event.message)}
                                 </span>
 
                             </div>
@@ -680,6 +686,36 @@ document.addEventListener(
         ) {
             state =
                 newState;
+
+            const undoPanel = app.querySelector("[data-buyin-undo-panel]");
+            if (undoPanel) {
+                const undo = state.undo_buyin;
+                undoPanel.hidden = !undo;
+                if (undo) {
+                    undoPanel.querySelector("[data-buyin-undo-description]").textContent =
+                        `${undo.name} · ${undo.kind === "REENTRY" ? "Återinköp" : "Sen anmälan"} · ${undo.amount} kr`;
+                    undoPanel.querySelector("[data-undo-buyin]").disabled = !undo.enabled;
+                    const reason = undoPanel.querySelector("[data-buyin-undo-reason]");
+                    reason.textContent = undo.reason || "";
+                    reason.hidden = !undo.reason;
+                }
+            }
+
+            const playersTotal = app.querySelector("[data-players-total]");
+            if (playersTotal) {
+                playersTotal.textContent = state.players_total;
+            }
+
+            const registrationForm = app.querySelector(".late-registration-form");
+            if (registrationForm) {
+                registrationForm.hidden = !["READY", "RUNNING", "PAUSED"].includes(state.status);
+                const playerSelect = registrationForm.querySelector("[name=player_id]");
+                for (const option of Array.from(playerSelect.options)) {
+                    if (option.value && state.players.some(player => String(player.player_id) === option.value)) {
+                        option.remove();
+                    }
+                }
+            }
 
             if (
                 prizePoolElement
@@ -1183,6 +1219,53 @@ document.addEventListener(
             }
         }
 
+
+        const undoBuyinButton = app.querySelector("[data-undo-buyin]");
+        const undoBuyinDialog = app.querySelector("[data-buyin-undo-dialog]");
+        let pendingBuyinUndo = null;
+        if (undoBuyinButton && undoBuyinDialog) {
+            const confirmUndo = undoBuyinDialog.querySelector("[data-confirm-buyin-undo]");
+            const undoError = undoBuyinDialog.querySelector("[data-buyin-undo-error]");
+            undoBuyinButton.addEventListener("click", () => {
+                const undo = state?.undo_buyin;
+                if (!undo?.enabled) {
+                    return;
+                }
+                const effect = undo.kind === "REENTRY"
+                    ? "Spelaren återgår till sin tidigare placering."
+                    : "Spelaren tas bort ur turneringen men finns kvar i spelarlistan.";
+                pendingBuyinUndo = undo;
+                undoBuyinDialog.querySelector("[data-buyin-undo-copy]").textContent =
+                    `Ångra inköpet för ${undo.name} (${undo.amount} kr)? ${effect} Potterna och priserna återställs.`;
+                confirmUndo.disabled = false;
+                undoError.hidden = true;
+                undoBuyinDialog.showModal();
+            });
+            undoBuyinDialog.querySelector("[data-cancel-buyin-undo]").addEventListener("click", () => {
+                pendingBuyinUndo = null;
+                undoBuyinDialog.close();
+            });
+            undoBuyinDialog.addEventListener("cancel", () => { pendingBuyinUndo = null; });
+            confirmUndo.addEventListener("click", async () => {
+                const undo = pendingBuyinUndo;
+                if (!undo) {
+                    return;
+                }
+                confirmUndo.disabled = true;
+                try {
+                    await postAction("undo-buyin", {action_id: undo.id});
+                    pendingBuyinUndo = null;
+                    undoBuyinDialog.close();
+                    if (undo.kind === "LATE_REGISTRATION") {
+                        window.location.reload();
+                    }
+                } catch (error) {
+                    undoError.textContent = error.message;
+                    undoError.hidden = false;
+                    confirmUndo.disabled = false;
+                }
+            });
+        }
 
         confirmElimination
             .addEventListener(

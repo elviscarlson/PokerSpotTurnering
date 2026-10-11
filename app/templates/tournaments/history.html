@@ -270,6 +270,14 @@ Turneringar · PokerSpot
 
                 {% endif %}
 
+                <a
+                    class="button button-secondary history-delete-button"
+                    href="{{ url_for('tournaments.delete_tournament', tournament_id=tournament.id) }}"
+                    aria-label="Ta bort {{ tournament.name }}"
+                >
+                    Ta bort
+                </a>
+
             </div>
 
         </article>

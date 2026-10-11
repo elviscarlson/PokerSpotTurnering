@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Ta bort {{ tournament.name }} · PokerSpot{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/statistics.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="history-empty tournament-delete-confirmation">
+    <p class="eyebrow">TA BORT TURNERING</p>
+    <h1>{{ tournament.name }}</h1>
+    <p>
+        {{ tournament.tournament_date.strftime('%d/%m/%Y') }} ·
+        {{ tournament.player_count }} spelare · {{ tournament.status }}
+    </p>
+    <p>
+        Turneringen och dess inköp, utslagningar, bounties och resultat
+        tas bort permanent. Den försvinner även från statistiken.
+        Spelarna finns kvar i spelarlistan. Detta går inte att ångra.
+    </p>
+    <form method="post" action="{{ url_for('tournaments.delete_tournament', tournament_id=tournament.id) }}">
+        <input type="hidden" name="delete_token" value="{{ delete_token }}">
+        <a class="button button-secondary" href="{{ url_for('tournaments.list_tournaments') }}">Avbryt</a>
+        <button class="button button-primary" type="submit">Ta bort turneringen</button>
+    </form>
+</section>
+{% endblock %}

@@ -257,6 +257,41 @@
                 data-player-list
             ></div>
 
+            <section class="buyin-undo-panel" data-buyin-undo-panel hidden>
+                <h3>Senaste inköp</h3>
+                <p data-buyin-undo-description></p>
+                <button class="button button-secondary" type="button" data-undo-buyin>
+                    Ångra senaste inköp
+                </button>
+                <p data-buyin-undo-reason hidden></p>
+            </section>
+
+            <form
+                class="late-registration-form"
+                action="{{ url_for('tournaments.add_tournament_player', tournament_id=tournament.id) }}"
+                method="post"
+            >
+                <h3>Lägg till spelare</h3>
+                <p>
+                    Inköp: {{ tournament.buy_in }} kr
+                    {% if tournament.bounty_enabled %}
+                        (varav {{ tournament.bounty_amount }} kr bounty)
+                    {% endif %}.
+                    Startstack: {{ tournament.structure.starting_stack }}.
+                    Antalet betalda platser behålls och prissummorna räknas upp.
+                </p>
+                <label for="late-player-id">Befintlig spelare</label>
+                <select id="late-player-id" name="player_id">
+                    <option value="">Välj spelare</option>
+                    {% for player in available_players %}
+                        <option value="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="late-player-name">Eller nytt spelarnamn</label>
+                <input id="late-player-name" name="new_player_name" maxlength="80" autocomplete="off">
+                <button class="button button-primary" type="submit">Registrera inköp</button>
+            </form>
+
         </aside>
 
     </section>
@@ -277,7 +312,7 @@
 
                 <small>
                     /
-                    {{ tournament.player_count }}
+                    <span data-players-total>{{ tournament.player_count }}</span>
                 </small>
             </strong>
 
@@ -422,6 +457,18 @@
         hidden
     ></div>
 
+
+    <dialog class="elimination-dialog" data-buyin-undo-dialog>
+        <form method="dialog" class="elimination-dialog-card">
+            <h2>Ångra inköp</h2>
+            <p class="elimination-dialog-copy" data-buyin-undo-copy></p>
+            <p role="alert" data-buyin-undo-error hidden></p>
+            <div class="elimination-dialog-actions">
+                <button class="button button-secondary" type="button" data-cancel-buyin-undo>Avbryt</button>
+                <button class="button button-primary" type="button" data-confirm-buyin-undo>Ångra inköpet</button>
+            </div>
+        </form>
+    </dialog>
 
     <dialog
         class="elimination-dialog"
