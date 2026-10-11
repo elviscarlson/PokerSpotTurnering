@@ -219,29 +219,11 @@ a {
 
 
 .brand-mark {
-    width: 34px;
-    height: 34px;
-
-    display: grid;
-    place-items: center;
-
-    border-radius: 10px;
-
-    background:
-        linear-gradient(
-            145deg,
-            var(--accent-bright),
-            var(--accent)
-        );
-
-    box-shadow:
-        0 8px 28px
-        rgba(225, 29, 46, 0.17);
-
-    color: white;
-
-    font-size: 13px;
-    font-weight: 850;
+    width: 48px;
+    height: 48px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 
