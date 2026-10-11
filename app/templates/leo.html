@@ -11,7 +11,7 @@
         <h1>ALL-IN<br><span>MED LEO.</span></h1>
         <p class="leo-subtitle">När någon säger ”bara en liten höjning”.</p>
         <button class="leo-button" type="button" data-leo-strike>ALL-IN! <span aria-hidden="true">♠</span></button>
-        <button class="leo-sound-toggle" type="button" data-leo-sound aria-pressed="true" aria-label="Katanaljud">Ljud på</button>
+        <button class="leo-sound-toggle" type="button" data-leo-sound aria-pressed="true" aria-label="Katanaljud och röst">Ljud på</button>
         <p class="leo-response" data-leo-response role="status" aria-live="polite">Bordet är ditt.</p>
         <nav class="friend-links" aria-label="PokerSpot-legender">
             <a href="{{ url_for('main.leo') }}" aria-current="page">Leo</a>
@@ -37,5 +37,5 @@
 </section>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/leo.js', v='2') }}" defer></script>
+<script src="{{ url_for('static', filename='js/leo.js', v='3') }}" defer></script>
 {% endblock %}
