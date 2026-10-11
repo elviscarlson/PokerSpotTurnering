@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Leo · All-in · PokerSpot{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leo.css', v='1') }}">
+{% endblock %}
+{% block content %}
+<section class="leo-page" data-leo-page>
+    <div class="leo-copy">
+        <p class="leo-eyebrow">POKERSPOTS HEMLIGA BOSS</p>
+        <h1>ALL-IN<br><span>MED LEO.</span></h1>
+        <p class="leo-subtitle">När någon säger ”bara en liten höjning”.</p>
+        <button class="leo-button" type="button" data-leo-strike>ALL-IN! <span aria-hidden="true">♠</span></button>
+        <p class="leo-response" data-leo-response role="status" aria-live="polite">Bordet är ditt.</p>
+        <a class="leo-back" href="{{ url_for('main.dashboard') }}">← Tillbaka till pokern</a>
+    </div>
+    <div class="leo-stage">
+        <span class="leo-suit leo-suit-one" aria-hidden="true">♠</span>
+        <span class="leo-suit leo-suit-two" aria-hidden="true">♦</span>
+        <span class="leo-suit leo-suit-three" aria-hidden="true">♥</span>
+        <div class="leo-halo" aria-hidden="true"></div>
+        <div class="leo-portrait">
+            <img class="leo-image" src="{{ url_for('static', filename='leo.png', v='1') }}"
+                 width="1254" height="1254" alt="Leo i kostym med ett svärd framför sig">
+        </div>
+        <div class="leo-slash" aria-hidden="true"></div>
+        <span class="leo-badge">LEO <span>♠</span> LEGENDSTATUS</span>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/leo.js', v='1') }}" defer></script>
+{% endblock %}

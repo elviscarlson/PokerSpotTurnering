@@ -41,6 +41,11 @@ def dashboard():
     )
 
 
+@main_bp.get("/leo")
+def leo():
+    return render_template("leo.html")
+
+
 @main_bp.get("/health")
 def health():
     return jsonify(
