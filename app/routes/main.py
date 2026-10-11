@@ -49,7 +49,7 @@ def leo():
 FRIEND_PROFILES = {
     "elvis": {
         "name": "Elvis",
-        "image": "elvis.jpeg",
+        "image": "elvis.png",
         "eyebrow": "POKERSPOTS EGEN KUNG",
         "headline": "POKERFEJS",
         "tagline": "PÅ MAX.",
