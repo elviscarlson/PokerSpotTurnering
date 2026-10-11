@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.name }} · PokerSpot{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leo.css', v='1') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css', v='2') }}">
+{% endblock %}
+{% block content %}
+<section class="leo-page friend-page friend-page--{{ slug }}" data-friend-page
+         data-friend="{{ slug }}" data-lines='{{ profile.lines | tojson }}'>
+    <div class="leo-copy">
+        <p class="leo-eyebrow">{{ profile.eyebrow }}</p>
+        <h1>{{ profile.headline }}<br><span>{{ profile.tagline }}</span></h1>
+        <p class="leo-subtitle">{{ profile.subtitle }}</p>
+        <button class="leo-button" type="button" data-friend-action>{{ profile.button }} <span aria-hidden="true">♠</span></button>
+        <p class="leo-response" data-friend-response role="status" aria-live="polite">{{ profile.response }}</p>
+        <nav class="friend-links" aria-label="PokerSpot-legender">
+            <a href="{{ url_for('main.leo') }}">Leo</a>
+            <a href="{{ url_for('main.elvis') }}" {% if slug == 'elvis' %}aria-current="page"{% endif %}>Elvis</a>
+            <a href="{{ url_for('main.hugo') }}" {% if slug == 'hugo' %}aria-current="page"{% endif %}>Hugo</a>
+        </nav>
+        <a class="leo-back" href="{{ url_for('main.dashboard') }}">← Tillbaka till pokern</a>
+    </div>
+    <div class="leo-stage">
+        <div class="leo-halo" aria-hidden="true"></div>
+        <div class="friend-effects" aria-hidden="true">
+            {% if slug == 'hugo' %}
+                {% for i in range(10) %}<span class="friend-bubble" style="--i: {{ i }}"></span>{% endfor %}
+                <span class="friend-ripple"></span>
+            {% else %}
+                {% for i in range(9) %}<span class="friend-chip" style="--i: {{ i }}">♠</span>{% endfor %}
+                <span class="friend-crown">♛</span>
+            {% endif %}
+        </div>
+        <div class="leo-portrait friend-portrait">
+            <img class="leo-image friend-image" src="{{ url_for('static', filename=profile.image, v='1') }}"
+                 alt="{{ profile.alt }}" fetchpriority="high">
+        </div>
+        <span class="leo-badge">{{ profile.name | upper }} <span>♠</span> {{ profile.badge }}</span>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/friends.js', v='1') }}" defer></script>
+{% endblock %}
