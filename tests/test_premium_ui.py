@@ -148,7 +148,7 @@ def test_display_remains_standalone(
     )
 
     assert (
-        "ENTER FULLSCREEN"
+        "Helskärm"
         in page
     )
 

@@ -90,8 +90,10 @@ def test_display_page_returns_200(
     )
 
     assert "Display Test" in page
-    assert "ENTER FULLSCREEN" in page
+    assert "Helskärm" in page
     assert "POKERSPOT" in page
+    assert "Tid kvar på nivån" in page
+    assert "SPELARE KVAR" in page
 
 
 def test_draft_cannot_open_display(
