@@ -1,0 +1,21 @@
+{
+  "description": "Short LeBron James interview recordings downloaded unchanged from Myinstants; no generated speech, voice cloning, pitch shifting or playback-rate changes.",
+  "clips": [
+    {
+      "file": "cleveland.mp3",
+      "quote": "Cleveland, this is for you!",
+      "event": "2016 NBA Finals, post-game interview",
+      "source": "https://www.myinstants.com/en/instant/lebron-james-cleveland-98661/",
+      "download": "https://www.myinstants.com/media/sounds/lebron-james-cleveland-this-is-for-you_1kvS6Ic.mp3",
+      "original_interview": "https://www.nba.com/watch/video/channels/playoffs/finals/2016/06/20/0041500407-cle-gsw-play34.nba"
+    },
+    {
+      "file": "about-damn-time.mp3",
+      "quote": "It's about damn time.",
+      "event": "2012 NBA Finals, trophy presentation",
+      "source": "https://www.myinstants.com/en/instant/lebron-about-damn-time-6916/",
+      "download": "https://www.myinstants.com/media/sounds/about-damn-time.mp3",
+      "original_interview": "https://www.nba.com/watch/video/lebron-on-court-presentation-after-winning-his-1st-nba-championship-in-2012-its-about-damn-time"
+    }
+  ]
+}

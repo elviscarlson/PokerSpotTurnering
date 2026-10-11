@@ -79,67 +79,60 @@ async function playKatanaSound() {
     });
 }
 
-function speakLeoLine(line) {
-    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
-    const speech = window.speechSynthesis;
-    // Choose an available English narrator; browser voices have no ethnicity metadata.
-    const englishVoices = speech.getVoices().filter(voice => /^en(?:-|_)/i.test(voice.lang));
-    const narratorNames = /\b(david|mark|guy|daniel|alex|george|james|ryan)\b/i;
-    const voice = englishVoices.find(voice => voice.localService && narratorNames.test(voice.name))
-        || englishVoices.find(voice => narratorNames.test(voice.name))
-        || englishVoices.find(voice => voice.localService)
-        || englishVoices[0];
-    const utterance = new SpeechSynthesisUtterance(line);
-    utterance.lang = voice ? voice.lang : "en-US";
-    if (voice) utterance.voice = voice;
-    utterance.pitch = .72;
-    utterance.rate = 1.05;
-    utterance.volume = .9;
-    // Replace an unfinished joke instead of building up a queue on repeated clicks.
-    speech.cancel();
-    speech.speak(utterance);
-}
-
 document.addEventListener("DOMContentLoaded", () => {
     const page = document.querySelector("[data-leo-page]");
     if (!page) return;
     const button = page.querySelector("[data-leo-strike]");
     const response = page.querySelector("[data-leo-response]");
     const soundToggle = page.querySelector("[data-leo-sound]");
-    if (window.speechSynthesis) window.speechSynthesis.getVoices();
+    const quotes = Array.from(page.querySelectorAll("[data-leo-quote]"));
+    const sourceLink = page.querySelector("[data-leo-quote-source]");
+    let currentQuote = null;
+    const stopQuotes = () => {
+        currentQuote = null;
+        quotes.forEach(audio => { audio.pause(); audio.currentTime = 0; });
+    };
     let soundEnabled = true;
     soundToggle.addEventListener("click", () => {
         soundEnabled = !soundEnabled;
         soundToggle.setAttribute("aria-pressed", String(soundEnabled));
         soundToggle.textContent = soundEnabled ? "Ljud på" : "Ljud av";
         if (!soundEnabled) {
-            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            stopQuotes();
             if (katanaAudio && katanaOutput) katanaOutput.gain.setTargetAtTime(0, katanaAudio.currentTime, .015);
         }
     });
-    const lines = [
-        "All in! Somebody's losing their chips tonight!",
-        "Leo brought a sword to a poker game. Good luck!",
-        "That's not a raise. That's a financial plot twist!",
-        "Somebody call security. Leo just stole the whole pot!",
-    ];
     let turn = 0;
     button.addEventListener("click", () => {
-        const line = lines[turn++ % lines.length];
+        stopQuotes();
+        const quote = quotes[turn++ % quotes.length];
+        const line = quote ? quote.dataset.quote : "Bordet är ditt.";
+        response.textContent = quote ? `“${line}” — LeBron James` : line;
+        if (quote && sourceLink) {
+            sourceLink.href = quote.dataset.source;
+            sourceLink.hidden = false;
+            sourceLink.parentElement.hidden = false;
+        }
         if (soundEnabled) {
             void playKatanaSound().catch(() => {});
-            // Speech is optional: unsupported devices still get the visual joke and slash.
-            try { speakLeoLine(line); } catch (_) { /* Keep the button working without speech. */ }
+            if (quote) {
+                currentQuote = quote;
+                quote.volume = .9;
+                // Play a local recording directly in the click, including on mobile.
+                // Stop the previous clip before starting another; never synthesize speech.
+                void quote.play().catch(error => {
+                    if (currentQuote === quote && soundEnabled && error.name !== "AbortError") {
+                        response.textContent += " (Ljudklippet kunde inte spelas.)";
+                    }
+                });
+            }
         }
         button.disabled = true;
-        response.textContent = line;
         page.classList.add("leo-striking");
         setTimeout(() => {
             page.classList.remove("leo-striking");
             button.disabled = false;
         }, 750);
     });
-    window.addEventListener("pagehide", () => {
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
-    });
+    window.addEventListener("pagehide", stopQuotes);
 });
