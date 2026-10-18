@@ -12,6 +12,15 @@ from app.models import AppMeta, CashGame, CashGameBuyIn, CashGameEntry, CashGame
 
 PROFILE_SLUGS = ("leo", "elvis", "hugo", "olle", "elias", "erik")
 
+WINNER_PORTRAITS = {
+    "leo": ("leo.png", "Tog med svärdet. Gick hem med markerna."),
+    "elvis": ("elvis.png", "Kungen tog betalt för audiensen."),
+    "hugo": ("hugo.png", "Dök ner i potten. Kom upp med vinsten."),
+    "olle": ("olle1.png", "Korv på hjärnan. Vinst i fickan."),
+    "elias": ("elias.png", "Synade bluffen. Tog resten."),
+    "erik": ("erik.png", "Pekade på topplistan. Hamnade överst."),
+}
+
 
 class CashGameError(ValueError):
     pass
@@ -248,16 +257,49 @@ def player_report(player: Player | None, games: list[CashGame]):
     return rows[0] if rows else {"player": player, "buy_ins": 0, "cash_outs": 0, "net": 0, "count": 0, "wins": 0, "history": [], "series": []}
 
 
-def profile_context(slug: str):
+def profile_links():
+    """Resolve the same explicit or unambiguous name link everywhere portraits appear."""
     players = list(db.session.scalars(select(Player).order_by(Player.name)))
-    binding = db.session.scalar(select(AppMeta).where(AppMeta.key == f"cashgame.profile.{slug}"))
-    player = None
-    if binding is not None:
-        player = next((p for p in players if str(p.id) == binding.value), None)
-    else:
-        exact = [p for p in players if p.name_key == slug]
-        matching = exact or [p for p in players if p.name.split()[0].casefold() == slug]
-        if len(matching) == 1:
-            player = matching[0]
+    keys = {f"cashgame.profile.{slug}": slug for slug in PROFILE_SLUGS}
+    bindings = {
+        keys[binding.key]: binding.value
+        for binding in db.session.scalars(select(AppMeta).where(AppMeta.key.in_(keys)))
+    }
+    links = {}
+    for slug in PROFILE_SLUGS:
+        if slug in bindings:
+            links[slug] = next((p for p in players if str(p.id) == bindings[slug]), None)
+        else:
+            exact = [p for p in players if p.name_key == slug]
+            matching = exact or [p for p in players if p.name.split()[0].casefold() == slug]
+            links[slug] = matching[0] if len(matching) == 1 else None
+    return players, links, set(bindings)
+
+
+def cashgame_winners(game: CashGame):
+    """Celebrate positive net profit after adjustments, independent of Swish payments."""
+    if game.status != "COMPLETED" or not game.entries:
+        return []
+    maximum = max(entry.net or 0 for entry in game.entries)
+    if maximum <= 0:
+        return []
+    _, links, explicit = profile_links()
+    winners = []
+    for entry in sorted(game.entries, key=lambda entry: (entry.player.name.casefold(), entry.player_id)):
+        if entry.net != maximum:
+            continue
+        candidates = [slug for slug, player in links.items() if player and player.id == entry.player_id]
+        explicit_candidates = [slug for slug in candidates if slug in explicit]
+        choices = explicit_candidates or candidates
+        # Conflicting explicit links should not silently put the wrong face on a player.
+        slug = choices[0] if len(choices) == 1 else None
+        image, quote = WINNER_PORTRAITS[slug] if slug else (None, "Tack för insättningarna, hälsar kvällens bankir.")
+        winners.append({"entry": entry, "slug": slug, "image": image, "quote": quote})
+    return winners
+
+
+def profile_context(slug: str):
+    players, links, _ = profile_links()
+    player = links[slug]
     games = all_games() if player else []
     return {"cashgame_slug": slug, "cashgame_players": players, "cashgame_player": player, "cashgame_report": player_report(player, games)}

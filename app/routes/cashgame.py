@@ -110,6 +110,7 @@ def detail(game_id):
         except service.CashGameError as exc:
             adjustment_error = str(exc)
     return render_template("cashgame/detail.html", game=game, plan=plan, available_players=available,
+                           winners=service.cashgame_winners(game),
                            adjustments=adjustments, adjustment_error=adjustment_error,
                            difference=game.total_cash_outs - game.total_buy_ins,
                            pending_cash_outs=sum(entry.cash_out_ore is None for entry in game.entries))

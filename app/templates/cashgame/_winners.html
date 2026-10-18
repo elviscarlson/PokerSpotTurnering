@@ -1,0 +1,40 @@
+{% if winners %}
+<section class="cash-winners" aria-labelledby="cash-winners-title">
+    <div class="cash-section-heading">
+        <div>
+            <p class="eyebrow">{{ 'DELAD TRON. DUBBELT SKRYT.' if winners | length > 1 else 'KVÄLLENS BANKIR HAR ORDET' }}</p>
+            <h2 id="cash-winners-title">Kvällens största vinnare</h2>
+        </div>
+        <p class="cash-muted">Nettovinst efter alla inköp och diffjustering.</p>
+    </div>
+    <div class="cash-winners-grid {% if winners | length > 1 %}cash-winners-tied{% endif %}">
+        {% for winner in winners %}
+        <article class="cash-champion" data-cash-champion>
+            <div class="cash-champion-copy">
+                <span class="cash-champion-badge">{{ 'Delad förstaplats' if winners | length > 1 else 'Bordets största plus' }}</span>
+                <h3>{{ winner.entry.player.name }}</h3>
+                <strong class="cash-champion-profit">{{ winner.entry.net | cash_money(true) }}</strong>
+                <p>{{ winner.quote }}</p>
+                <div class="cash-champion-actions">
+                    <button type="button" class="button button-secondary" data-celebrate-winner>Lite applåder, tack! <span aria-hidden="true">♠</span></button>
+                    {% if winner.slug %}<a href="{{ url_for('main.' ~ winner.slug) }}">Besök vinnaren ↗</a>{% endif %}
+                </div>
+                <p class="cash-champion-response" data-champion-response role="status" aria-live="polite"></p>
+            </div>
+            <div class="cash-champion-stage">
+                <div class="cash-champion-halo" aria-hidden="true"></div>
+                <span class="cash-champion-crown" aria-hidden="true">♛</span>
+                {% if winner.image %}
+                    {% if winner.slug %}<a class="cash-champion-portrait" href="{{ url_for('main.' ~ winner.slug) }}" aria-label="Till {{ winner.entry.player.name }}s personsida">{% endif %}
+                    <img class="cash-champion-image" src="{{ url_for('static', filename=winner.image, v='2' if winner.slug == 'erik' else '1') }}" alt="{{ winner.entry.player.name }}, kvällens vinnare" loading="lazy">
+                    {% if winner.slug %}</a>{% endif %}
+                {% else %}<span class="cash-champion-placeholder" aria-hidden="true">♠</span>{% endif %}
+            </div>
+            <div class="cash-champion-confetti" aria-hidden="true">
+                {% for i in range(10) %}<span style="--i: {{ i }}">{{ '♠' if i % 2 else '♦' }}</span>{% endfor %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}

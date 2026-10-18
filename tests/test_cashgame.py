@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import StaleDataError
 
 from app.extensions import db
-from app.models import CashGame, CashGameBuyIn, Player, Tournament
+from app.models import AppMeta, CashGame, CashGameBuyIn, Player, Tournament
 from app.services import cashgame as cash
 from app.services.player_service import create_player
 
@@ -306,3 +306,77 @@ def test_routes_show_diff_preview_and_allow_closing_with_difference(app, client)
 def test_non_ascii_csrf_is_rejected_without_server_error(client):
     token(client)
     assert client.post("/cashgame/new", data={"csrf_token": "felaktigtåäö"}).status_code == 400
+
+
+def test_winner_is_highest_net_after_all_buy_ins_not_largest_cash_out(app, client):
+    with app.app_context():
+        people = players()
+        game = cash.create_game("Rätt vinnare", date.today(), people, 20_000)
+        db.session.commit()
+        cash.add_buy_in(game, people[0], 20_000)
+        cash.save_cash_outs(game, {entry.id: amount for entry, amount in zip(game.entries, [40_000, 35_000, 15_000, 10_000])})
+        cash.complete_game(game)
+        db.session.commit()
+        game_id = game.id
+        winners = cash.cashgame_winners(game)
+        assert len(winners) == 1
+        assert winners[0]["entry"].player.name == "Elvis"
+        assert winners[0]["image"] == "elvis.png"
+    page = client.get(f"/cashgame/{game_id}")
+    assert page.status_code == 200
+    assert 'class="cash-champion-image"' in page.text
+    assert 'href="/elvis"' in page.text
+    assert "Kungen tog betalt för audiensen." in page.text
+
+
+def test_tied_winners_use_adjusted_profit_and_survive_completed_swish(app):
+    with app.app_context():
+        game = cash.create_game("Delad tron", date.today(), players(), 20_000)
+        db.session.commit()
+        cash.save_cash_outs(game, {entry.id: amount for entry, amount in zip(game.entries, [35_001, 35_000, 5_000, 5_000])})
+        cash.complete_game(game)
+        assert {winner["slug"] for winner in cash.cashgame_winners(game)} == {"leo", "elvis"}
+        for payment in cash.settlement_plan(game):
+            cash.record_transfer(game, payment.payer.id, payment.receiver.id, payment.amount_ore)
+        assert cash.settlement_plan(game) == []
+        assert {winner["entry"].net for winner in cash.cashgame_winners(game)} == {15_000}
+
+
+def test_winner_portrait_uses_the_explicit_profile_binding_for_renamed_players(app):
+    with app.app_context():
+        people = players()
+        people[0].name = "Kassakungen"
+        people[0].name_key = "kassakungen"
+        db.session.add(AppMeta(key="cashgame.profile.erik", value=str(people[0].id)))
+        game = game_with_result(people)
+        winner = cash.cashgame_winners(game)[0]
+        assert winner["slug"] == "erik"
+        assert winner["image"] == "erik.png"
+        assert cash.profile_context("erik")["cashgame_player"].id == people[0].id
+
+
+def test_unknown_winner_has_no_portrait_and_does_not_promote_a_known_runner_up(app):
+    with app.app_context():
+        people = players()
+        people[0].name = "Gästspelaren"
+        people[0].name_key = "gästspelaren"
+        game = game_with_result(people)
+        winners = cash.cashgame_winners(game)
+        assert len(winners) == 1
+        assert winners[0]["entry"].player.name == "Gästspelaren"
+        assert winners[0]["slug"] is None
+        assert winners[0]["image"] is None
+
+
+def test_open_game_and_break_even_game_have_no_winner_banner(app, client):
+    with app.app_context():
+        game = cash.create_game("Inte färdig", date.today(), players(), 20_000)
+        db.session.commit()
+        cash.save_cash_outs(game, {entry.id: amount for entry, amount in zip(game.entries, [35_000, 25_000, 15_000, 5_000])})
+        assert cash.cashgame_winners(game) == []
+        cash.save_cash_outs(game, {entry.id: 20_000 for entry in game.entries})
+        cash.complete_game(game)
+        db.session.commit()
+        assert cash.cashgame_winners(game) == []
+        game_id = game.id
+    assert 'data-cash-champion' not in client.get(f"/cashgame/{game_id}").text

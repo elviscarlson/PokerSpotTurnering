@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% from 'cashgame/_macros.html' import form_meta, net %}
 {% block title %}{{ game.name }} · Cashgame · PokerSpot{% endblock %}
-{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/cashgame.css', v='1') }}">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/cashgame.css', v='2') }}">{% endblock %}
 {% block content %}<section class="cash-page">
     <a class="back-link" href="{{ url_for('cashgame.index') }}">← Alla cashgame-resultat</a>
     <header class="cash-heading"><div><p class="eyebrow">CASHGAME · {{ game.played_on.strftime('%d/%m %Y') }}</p><h1>{{ game.name }}</h1><p>{{ 'Resultat fastställda. Dags att reglera nettot.' if game.status == 'COMPLETED' else 'Lägg till inköp under kvällen. Utcheckat är pengarna spelaren har kvar vid bordet.' }}</p></div><span class="cash-status {% if game.status == 'COMPLETED' %}cash-status-done{% endif %}">{{ 'Avslutad' if game.status == 'COMPLETED' else 'Pågår' }}</span></header>
     <div class="cash-metrics"><div><span>Inköp</span><strong>{{ game.total_buy_ins | cash_money }}</strong></div><div><span>Utcheckat</span><strong>{{ game.total_cash_outs | cash_money }}</strong></div><div><span>Spelare</span><strong>{{ game.entries | length }}</strong></div><div><span>{{ 'Kvar att swisha' if game.status == 'COMPLETED' else 'Utcheckat − inköp' }}</span><strong>{% if game.status == 'COMPLETED' %}{{ plan | sum(attribute='amount_ore') | cash_money }}{% else %}{{ net(difference) }}{% endif %}</strong></div></div>
+    {% include 'cashgame/_winners.html' %}
     <section class="cash-panel"><div class="cash-section-heading"><div><h2>Bordets resultat</h2><p class="cash-muted">Alla inköp räknas med. Skriv 0 i utcheckning om markerna är slut.</p></div></div>
         {% if game.status == 'OPEN' %}<form method="post" id="cash-out-form" action="{{ url_for('cashgame.cash_outs', game_id=game.id) }}">{{ form_meta(game) }}</form>{% endif %}
         <div class="cash-table-wrap"><table class="cash-table"><thead><tr><th>Spelare</th><th>Inköp</th><th>Utcheckat, kr</th><th>Netto</th></tr></thead><tbody>{% for entry in game.entries %}
@@ -41,3 +42,4 @@
     {% endif %}
     <details class="cash-panel"><summary>Inköpshistorik</summary>{% for entry in game.entries %}<h3>{{ entry.player.name }}</h3>{% for buy_in in entry.buy_ins | reverse %}<div class="cash-log-row {% if buy_in.voided_at %}cash-voided{% endif %}"><div><strong>{{ buy_in.amount_ore | cash_money }}</strong><small>{{ 'Ångrat inköp' if buy_in.voided_at else 'Registrerat inköp' }} · #{{ buy_in.id }}</small></div>{% if game.status == 'OPEN' and not buy_in.voided_at %}<form method="post" action="{{ url_for('cashgame.undo_buy_in', game_id=game.id, buy_in_id=buy_in.id) }}">{{ form_meta(game) }}<button class="cash-text-button" type="submit">Ångra inköp</button></form>{% endif %}</div>{% endfor %}{% endfor %}</details>
 </section>{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/cashgame.js', v='2') }}" defer></script>{% endblock %}

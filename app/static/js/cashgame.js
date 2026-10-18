@@ -1,6 +1,19 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("[data-cash-champion]").forEach(card => {
+        const button = card.querySelector("[data-celebrate-winner]");
+        const response = card.querySelector("[data-champion-response]");
+        button.addEventListener("click", () => {
+            button.disabled = true;
+            card.classList.add("cash-champion-celebrating");
+            response.textContent = "Tack till kvällens sponsorer. Ni vet vilka ni är. ♠";
+            setTimeout(() => {
+                card.classList.remove("cash-champion-celebrating");
+                button.disabled = false;
+            }, 1600);
+        });
+    });
     const namespace = "http://www.w3.org/2000/svg";
     const money = value => `${value > 0 ? "+" : ""}${(value / 100).toLocaleString("sv-SE", {maximumFractionDigits: 2})} kr`;
     const element = (name, attributes = {}, content) => {
