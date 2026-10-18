@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% from 'cashgame/_macros.html' import form_meta %}
+{% block title %}Ny cashgame-kväll · PokerSpot{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/cashgame.css', v='1') }}">{% endblock %}
+{% block content %}<section class="cash-page cash-narrow">
+    <a class="back-link" href="{{ url_for('cashgame.index') }}">← Cashgame</a>
+    <header class="cash-heading"><div><p class="eyebrow">NY SPELKVÄLL</p><h1>Marker på bordet.</h1><p>Alla valda spelare får ett första inköp. Återinköp och sena spelare läggs till under kvällen.</p></div></header>
+    <form class="cash-panel cash-form" method="post">{{ form_meta() }}
+        <label for="name">Namn på spelkvällen<input id="name" name="name" maxlength="120" value="{{ request.form.get('name', '') }}" placeholder="Fredagscash hos Leo" required></label>
+        <div class="cash-form-grid"><label for="played_on">Datum<input type="date" id="played_on" name="played_on" value="{{ request.form.get('played_on', today.isoformat()) }}" required></label>
+        <label for="buy_in">Första inköp per spelare, kr<input id="buy_in" name="buy_in" inputmode="decimal" maxlength="12" placeholder="200" value="{{ request.form.get('buy_in', '') }}" required></label></div>
+        <fieldset><legend>Vilka är med?</legend><div class="cash-player-picker">{% for player in players %}<label><input type="checkbox" name="player_ids" value="{{ player.id }}" {% if player.id | string in request.form.getlist('player_ids') %}checked{% endif %}>{{ player.name }}</label>{% endfor %}</div></fieldset>
+        <p class="cash-muted">Saknas någon? <a href="{{ url_for('players.list_players') }}">Lägg till spelare</a> först.</p>
+        <button class="button button-primary" type="submit" {% if players | length < 2 %}disabled{% endif %}>Starta spelkvällen</button>
+    </form>
+</section>{% endblock %}

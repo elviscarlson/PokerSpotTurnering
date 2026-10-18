@@ -61,6 +61,7 @@ def register_blueprints(
     app: Flask,
 ) -> None:
     from .routes.api import api_bp
+    from .routes.cashgame import cashgame_bp
     from .routes.main import main_bp
     from .routes.players import players_bp
     from .routes.reentry_api import (
@@ -73,6 +74,7 @@ def register_blueprints(
     app.register_blueprint(
         main_bp
     )
+    app.register_blueprint(cashgame_bp)
 
     app.register_blueprint(
         players_bp

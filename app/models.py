@@ -832,4 +832,91 @@ class TournamentEvent(db.Model):
     )
 
 
+class CashGame(db.Model):
+    __tablename__ = "cash_games"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    played_on = db.Column(db.Date, nullable=False, default=date.today, index=True)
+    status = db.Column(db.String(20), nullable=False, default="OPEN")
+    version = db.Column(db.Integer, nullable=False, default=1)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utc_now)
+    entries = db.relationship("CashGameEntry", back_populates="game", cascade="all, delete-orphan", lazy="selectin", order_by="CashGameEntry.id")
+    transfers = db.relationship("CashGameTransfer", back_populates="game", cascade="all, delete-orphan", lazy="selectin", order_by="CashGameTransfer.id")
+    __mapper_args__ = {"version_id_col": version}
+    __table_args__ = (db.CheckConstraint("status IN ('OPEN', 'COMPLETED')", name="ck_cash_game_status"),)
+
+    @property
+    def total_buy_ins(self):
+        return sum(entry.total_buy_ins for entry in self.entries)
+
+    @property
+    def total_cash_outs(self):
+        return sum(entry.cash_out_ore or 0 for entry in self.entries)
+
+
+class CashGameEntry(db.Model):
+    __tablename__ = "cash_game_entries"
+
+    id = db.Column(db.Integer, primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey("cash_games.id", ondelete="CASCADE"), nullable=False, index=True)
+    player_id = db.Column(db.Integer, db.ForeignKey("players.id"), nullable=False, index=True)
+    cash_out_ore = db.Column(db.Integer, nullable=True)
+    cash_out_adjustment_ore = db.Column(db.Integer, nullable=False, default=0)
+    game = db.relationship("CashGame", back_populates="entries")
+    player = db.relationship("Player", lazy="selectin")
+    buy_ins = db.relationship("CashGameBuyIn", back_populates="entry", cascade="all, delete-orphan", lazy="selectin", order_by="CashGameBuyIn.id")
+    __table_args__ = (
+        db.UniqueConstraint("game_id", "player_id", name="uq_cash_game_player"),
+        db.CheckConstraint("cash_out_ore IS NULL OR cash_out_ore >= 0", name="ck_cash_out_nonnegative"),
+    )
+
+    @property
+    def total_buy_ins(self):
+        return sum(buy_in.amount_ore for buy_in in self.buy_ins if buy_in.voided_at is None)
+
+    @property
+    def buy_in_count(self):
+        return sum(buy_in.voided_at is None for buy_in in self.buy_ins)
+
+    @property
+    def net(self):
+        return None if self.cash_out_ore is None else self.adjusted_cash_out_ore - self.total_buy_ins
+
+    @property
+    def adjusted_cash_out_ore(self):
+        return None if self.cash_out_ore is None else self.cash_out_ore + (self.cash_out_adjustment_ore or 0)
+
+
+class CashGameBuyIn(db.Model):
+    __tablename__ = "cash_game_buy_ins"
+
+    id = db.Column(db.Integer, primary_key=True)
+    entry_id = db.Column(db.Integer, db.ForeignKey("cash_game_entries.id", ondelete="CASCADE"), nullable=False, index=True)
+    amount_ore = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utc_now)
+    voided_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    entry = db.relationship("CashGameEntry", back_populates="buy_ins")
+    __table_args__ = (db.CheckConstraint("amount_ore > 0", name="ck_cash_buy_in_positive"),)
+
+
+class CashGameTransfer(db.Model):
+    __tablename__ = "cash_game_transfers"
+
+    id = db.Column(db.Integer, primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey("cash_games.id", ondelete="CASCADE"), nullable=False, index=True)
+    payer_id = db.Column(db.Integer, db.ForeignKey("players.id"), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey("players.id"), nullable=False)
+    amount_ore = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utc_now)
+    voided_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    game = db.relationship("CashGame", back_populates="transfers")
+    payer = db.relationship("Player", foreign_keys=[payer_id], lazy="selectin")
+    receiver = db.relationship("Player", foreign_keys=[receiver_id], lazy="selectin")
+    __table_args__ = (
+        db.CheckConstraint("amount_ore > 0", name="ck_cash_transfer_positive"),
+        db.CheckConstraint("payer_id != receiver_id", name="ck_cash_transfer_different_players"),
+    )
+
+
 

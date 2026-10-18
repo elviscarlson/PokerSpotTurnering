@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% from 'cashgame/_macros.html' import net, report_content %}
+{% block title %}Cashgame · Resultat & Swish · PokerSpot{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/cashgame.css', v='1') }}">{% endblock %}
+{% block content %}
+<section class="cash-page">
+    <header class="cash-heading"><div><p class="eyebrow">POKERSPOT · CASHGAME</p><h1>Alla marker.<br><span>Alla resultat.</span></h1><p>Inköp, vinster och förluster. Från första inköpet till sista Swishen.</p></div>
+        <a class="button button-primary" href="{{ url_for('cashgame.new') }}">+ Ny spelkväll</a></header>
+    <div class="cash-metrics">
+        <div><span>Spelkvällar</span><strong>{{ completed_count }} <small>avslutade</small></strong></div>
+        <div><span>Inköp totalt</span><strong>{{ total_buy_ins | cash_money }}</strong></div>
+        <div><span>Spelare med resultat</span><strong>{{ rows | length }}</strong></div>
+        <div><span>Pågående kvällar</span><strong>{{ games | selectattr('status', 'equalto', 'OPEN') | list | length }}</strong></div>
+    </div>
+    <div class="cash-panel">
+        <div class="cash-section-heading"><div><h2>Vem ligger plus?</h2><p class="cash-muted">Netto = utcheckat − samtliga inköp. Endast avslutade cashgame räknas.</p></div></div>
+        {% if rows %}
+            <div class="cash-bars" aria-label="Nettovinst eller nettoförlust per spelare">
+                {% set maximum = namespace(value=1) %}{% for row in rows %}{% if row.net | abs > maximum.value %}{% set maximum.value = row.net | abs %}{% endif %}{% endfor %}
+                {% for row in rows %}<a class="cash-bar-row" href="{{ url_for('cashgame.index', player_id=row.player.id, _anchor='player-results') }}">
+                    <span>{{ row.player.name }}</span><div class="cash-bar-track"><div class="cash-bar {% if row.net < 0 %}cash-bar-negative{% endif %}" style="width:{{ (row.net | abs / maximum.value * 50) | round(2) }}%;{% if row.net < 0 %}right:50%;{% else %}left:50%;{% endif %}"></div></div>{{ net(row.net) }}</a>{% endfor %}
+            </div>
+            <div class="cash-table-wrap"><table class="cash-table"><caption class="cash-sr-only">Cashgame-resultat för alla spelare</caption><thead><tr><th>Spelare</th><th>Kvällar</th><th>Inköp</th><th>Utcheckat inkl. diff</th><th>Netto</th></tr></thead><tbody>
+            {% for row in rows %}<tr><td><a href="{{ url_for('cashgame.index', player_id=row.player.id, _anchor='player-results') }}">{{ row.player.name }}</a></td><td>{{ row.count }}</td><td>{{ row.buy_ins | cash_money }}</td><td>{{ row.cash_outs | cash_money }}</td><td>{{ net(row.net) }}</td></tr>{% endfor %}
+            </tbody></table></div>
+        {% else %}<div class="cash-empty"><h3>Första handen återstår.</h3><p>Skapa en spelkväll, lägg in inköp och avsluta med allas utcheckning. Här växer er resultathistorik fram.</p><a href="{{ url_for('cashgame.new') }}">Skapa första spelkvällen →</a></div>{% endif %}
+    </div>
+    <section class="cash-panel" id="player-results">
+        <div class="cash-section-heading"><h2>En spelares resa</h2><form method="get" class="cash-inline"><label for="player_id">Spelare</label><select name="player_id" id="player_id"><option value="">Välj spelare</option>{% for player in players %}<option value="{{ player.id }}" {% if selected_player and selected_player.id == player.id %}selected{% endif %}>{{ player.name }}</option>{% endfor %}</select><button class="button button-secondary" type="submit">Visa</button></form></div>
+        {% if report %}<h3>{{ report.player.name }}</h3>{{ report_content(report) }}{% else %}<p class="cash-muted">Välj en spelare för att se nettograf och alla resultat.</p>{% endif %}
+    </section>
+    <section class="cash-panel"><div class="cash-section-heading"><h2>Spelkvällar</h2><span class="cash-muted">{{ games | length }} totalt</span></div>
+        {% for game in games %}<a class="cash-game-link" href="{{ url_for('cashgame.detail', game_id=game.id) }}"><div><span class="cash-status {% if game.status == 'COMPLETED' %}cash-status-done{% endif %}">{{ 'Avslutad' if game.status == 'COMPLETED' else 'Pågår' }}</span><h3>{{ game.name }}</h3><p class="cash-muted">{{ game.played_on.strftime('%d/%m %Y') }} · {{ game.entries | length }} spelare</p></div><strong>{{ game.total_buy_ins | cash_money }} <span aria-hidden="true">↗</span></strong></a>{% else %}<p class="cash-muted">Inga spelkvällar ännu.</p>{% endfor %}
+    </section>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/cashgame.js', v='1') }}" defer></script>{% endblock %}

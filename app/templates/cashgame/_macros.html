@@ -1,0 +1,37 @@
+{% macro form_meta(game=None) -%}
+<input type="hidden" name="csrf_token" value="{{ cashgame_csrf() }}">
+{% if game %}<input type="hidden" name="version" value="{{ game.version }}">{% endif %}
+{%- endmacro %}
+
+{% macro net(value) -%}
+<span class="cash-net {% if value > 0 %}cash-positive{% elif value < 0 %}cash-negative{% endif %}">{{ value | cash_money(true) }}</span>
+{%- endmacro %}
+
+{% macro report_content(report) %}
+<div class="cash-metrics">
+    <div><span>Nettoresultat</span><strong>{{ net(report.net) }}</strong></div>
+    <div><span>Inköp totalt</span><strong>{{ report.buy_ins | cash_money }}</strong></div>
+    <div><span>Utcheckat inkl. diff</span><strong>{{ report.cash_outs | cash_money }}</strong></div>
+    <div><span>Avslutade kvällar</span><strong>{{ report.count }} <small>· {{ report.wins }} med vinst</small></strong></div>
+</div>
+{% if report.history %}
+<div class="cash-chart" data-cash-chart>
+    <h3>Resultatet över tid</h3>
+    <p class="cash-muted">Samlat netto efter varje avslutad spelkväll. Peka på grafen för belopp.</p>
+    <script type="application/json" data-chart-values>{{ report.series | tojson }}</script>
+    <div data-chart-drawing></div>
+    <p class="cash-chart-readout" data-chart-readout aria-live="polite">Totalt {{ report.net | cash_money(true) }}</p>
+</div>
+<div class="cash-table-wrap">
+    <table class="cash-table">
+        <caption class="cash-sr-only">Alla avslutade cashgame-resultat för {{ report.player.name }}</caption>
+        <thead><tr><th>Spelkväll</th><th>Inköp</th><th>Utcheckat</th><th>Netto</th></tr></thead>
+        <tbody>{% for item in report.history | reverse %}
+            <tr><td><a href="{{ url_for('cashgame.detail', game_id=item.game.id) }}">{{ item.game.name }}</a><small>{{ item.game.played_on.strftime('%d/%m %Y') }}</small></td>
+                <td>{{ item.entry.total_buy_ins | cash_money }}<small>{{ item.entry.buy_in_count }} inköp</small></td>
+                <td>{{ item.entry.adjusted_cash_out_ore | cash_money }}{% if item.entry.cash_out_adjustment_ore %}<small>Diff {{ item.entry.cash_out_adjustment_ore | cash_money(true) }}</small>{% endif %}</td><td>{{ net(item.entry.net) }}</td></tr>
+        {% endfor %}</tbody>
+    </table>
+</div>
+{% else %}<p class="cash-empty">Inga avslutade cashgame ännu. Resultatet visas när en spelkväll är färdig.</p>{% endif %}
+{% endmacro %}

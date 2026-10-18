@@ -25,7 +25,7 @@
 
     <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='css/app.css', v='leo-logo') }}"
+        href="{{ url_for('static', filename='css/app.css', v='cashgame-nav') }}"
     >
 
     {% block head %}
@@ -114,6 +114,8 @@
                         Spelare
                     </a>
 
+                    <a class="nav-link {% if request.blueprint == 'cashgame' %}nav-link-active{% endif %}"
+                       href="{{ url_for('cashgame.index') }}">Cashgame</a>
                 </nav>
 
 

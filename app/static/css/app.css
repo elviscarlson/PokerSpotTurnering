@@ -680,6 +680,8 @@ textarea:focus {
 
 /* RESPONSIVE HEADER */
 
+.main-nav { min-width: 0; max-width: 100%; }
+
 @media (max-width: 850px) {
 
     .site-header-inner {
@@ -722,14 +724,22 @@ textarea:focus {
 
 
     .site-header-inner {
-        min-height: 60px;
+        min-height: 100px;
+        grid-template-columns: 1fr auto;
+        row-gap: 0;
     }
+
+    .site-header-inner .brand { grid-column: 1; grid-row: 1; }
+    .header-actions { grid-column: 2; grid-row: 1; }
 
 
     .main-nav {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-self: stretch;
         overflow-x: auto;
 
-        justify-content: flex-start;
+        justify-content: center;
 
         border: 0;
 
@@ -769,7 +779,7 @@ textarea:focus {
 
 
     .flash-stack {
-        top: 70px;
+        top: 112px;
         right: 14px;
 
         width:

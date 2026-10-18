@@ -12,6 +12,7 @@ from app.services.statistics import (
     winnings_leaderboard,
     wins_leaderboard,
 )
+from app.services.cashgame import profile_context
 
 
 main_bp = Blueprint(
@@ -43,10 +44,28 @@ def dashboard():
 
 @main_bp.get("/leo")
 def leo():
-    return render_template("leo.html")
+    return render_template("leo.html", **profile_context("leo"))
 
 
 FRIEND_PROFILES = {
+    "erik": {
+        "name": "Erik",
+        "image": "erik.png",
+        "eyebrow": "POKERSPOTS TOPPLISTEEXPERT",
+        "headline": "KOLLA DÄR.",
+        "tagline": "TOPPLISTAN.",
+        "subtitle": "Erik pekar ut vinnaren. Märkligt nog pekar han alltid på sig själv.",
+        "button": "VISA VEM SOM BESTÄMMER!",
+        "response": "Han har redan hittat sin plats på listan.",
+        "badge": "HAR KOLL PÅ STÄLLNINGEN",
+        "alt": "Erik pekar på en topplista på en griffeltavla",
+        "lines": [
+            "Erik pekar på facit. Facit har inte godkänt det ännu.",
+            "Topplistan är inte fel. Den ligger bara en spelkväll efter.",
+            "Han räknar inte marker. Han räknar förstaplatser.",
+            "Bevismaterialet är tydligt. Enligt Erik, i alla fall.",
+        ],
+    },
     "elvis": {
         "name": "Elvis",
         "image": "elvis.png",
@@ -126,22 +145,22 @@ FRIEND_PROFILES = {
 
 @main_bp.get("/elvis")
 def elvis():
-    return render_template("friend.html", slug="elvis", profile=FRIEND_PROFILES["elvis"])
+    return render_template("friend.html", slug="elvis", profile=FRIEND_PROFILES["elvis"], **profile_context("elvis"))
 
 
 @main_bp.get("/hugo")
 def hugo():
-    return render_template("friend.html", slug="hugo", profile=FRIEND_PROFILES["hugo"])
+    return render_template("friend.html", slug="hugo", profile=FRIEND_PROFILES["hugo"], **profile_context("hugo"))
 
 
 @main_bp.get("/olle")
 def olle():
-    return render_template("friend.html", slug="olle", profile=FRIEND_PROFILES["olle"])
+    return render_template("friend.html", slug="olle", profile=FRIEND_PROFILES["olle"], **profile_context("olle"))
 
 
 @main_bp.get("/elias")
 def elias():
-    return render_template("friend.html", slug="elias", profile=FRIEND_PROFILES["elias"])
+    return render_template("friend.html", slug="elias", profile=FRIEND_PROFILES["elias"], **profile_context("elias"))
 
 
 @main_bp.get("/health")
@@ -154,3 +173,8 @@ def health():
             ),
         }
     )
+
+
+@main_bp.get("/erik")
+def erik():
+    return render_template("friend.html", slug="erik", profile=FRIEND_PROFILES["erik"], **profile_context("erik"))

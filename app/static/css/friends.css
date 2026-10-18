@@ -3,6 +3,21 @@
 .friend-page--olle { --friend-accent: #bb9aff; --friend-glow: #9970ff25; }
 .friend-page--olle.friend-alternate { --friend-accent: #5ee3ff; --friend-glow: #16bcdf25; }
 .friend-page--elias { --friend-accent: #b8ef75; --friend-glow: #92d83825; }
+.friend-page--erik { --friend-accent: #ffb36b; --friend-glow: #f6a04325; }
+.friend-page--erik .friend-image { width: 100%; height: min(70svh, 720px); object-fit: contain; margin: auto; }
+@media (max-width: 850px) { .friend-page--erik .friend-image { height: auto; max-height: 600px; } }
+.friend-page--erik .leo-button { font-size: 13px; letter-spacing: .03em; gap: 16px; }
+.friend-ranking { position: absolute; top: 8%; left: 8%; z-index: 3; color: #ffb36b; font-size: 54px; font-weight: 900; opacity: 0; text-shadow: 0 6px 20px #000; }
+.friend-star { position: absolute; top: 24%; left: calc(5% + var(--i) * 16%); z-index: 3; color: #ffb36b; font-size: 26px; opacity: 0; }
+.friend-acting.friend-page--erik .friend-ranking { animation: erik-rank 1.4s ease-out; }
+.friend-acting.friend-page--erik .friend-star { animation: olle-cards 1.15s ease-out both; animation-delay: calc(var(--i) * .05s); }
+.friend-acting.friend-page--erik .friend-portrait { animation: elvis-raise 1.15s ease-out; }
+@keyframes erik-rank { 0%, 100% { opacity: 0; transform: scale(.7) rotate(-10deg); } 20%, 70% { opacity: 1; transform: scale(1) rotate(-10deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .friend-acting.friend-page--erik .friend-ranking, .friend-acting.friend-page--erik .friend-star,
+    .friend-acting.friend-page--erik .friend-portrait { animation: none; }
+    .friend-acting.friend-page--erik .friend-ranking { opacity: 1; }
+}
 .leo-page:not(.friend-page) .friend-links { --friend-accent: var(--accent-bright); }
 .leo-sound-toggle { display: inline-block; margin: 12px 0 0 14px; padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: transparent; color: var(--text-secondary); font-size: 12px; cursor: pointer; }
 .leo-sound-toggle:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 3px; }

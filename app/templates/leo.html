@@ -2,7 +2,8 @@
 {% block title %}Leo · All-in · PokerSpot{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/leo.css', v='1') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css', v='3') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css', v='4') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cashgame.css', v='1') }}">
 {% endblock %}
 {% block content %}
 <section class="leo-page" data-leo-page>
@@ -26,6 +27,7 @@
             <a href="{{ url_for('main.hugo') }}">Hugo</a>
             <a href="{{ url_for('main.olle') }}">Olle</a>
             <a href="{{ url_for('main.elias') }}">Elias</a>
+            <a href="{{ url_for('main.erik') }}">Erik</a>
         </nav>
         <a class="leo-back" href="{{ url_for('main.dashboard') }}">← Tillbaka till pokern</a>
     </div>
@@ -42,7 +44,9 @@
         <span class="leo-badge">LEO <span>♠</span> LEGENDSTATUS</span>
     </div>
 </section>
+{% include 'cashgame/_profile.html' %}
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/leo.js', v='4') }}" defer></script>
+<script src="{{ url_for('static', filename='js/cashgame.js', v='1') }}" defer></script>
 {% endblock %}

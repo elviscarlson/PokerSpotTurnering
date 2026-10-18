@@ -1,0 +1,106 @@
+.cash-page { padding: 36px 0 64px; max-width: 1200px; margin: 0 auto; }
+.cash-narrow { max-width: 760px; }
+.cash-heading, .cash-section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 28px; }
+.cash-heading { padding: 18px 0 12px; }
+.cash-heading h1 { font-size: clamp(32px, 4.5vw, 64px); letter-spacing: -.055em; line-height: 1.05; margin: 14px 0; overflow-wrap: anywhere; }
+.cash-heading h1 span { color: var(--accent-bright); }
+.cash-heading p { color: var(--text-secondary); line-height: 1.7; max-width: 600px; }
+.cash-page h2 { font-size: 24px; letter-spacing: -.025em; margin: 0 0 10px; }
+.cash-page h3 { font-size: 16px; margin: 16px 0; }
+.cash-muted { color: var(--text-secondary); font-size: 13px; line-height: 1.65; margin: 4px 0; }
+.cash-panel { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; margin-bottom: 22px; }
+.cash-section-heading { margin-bottom: 20px; }
+.cash-section-heading > div { min-width: 0; }
+.cash-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 24px; }
+.cash-metrics > div { background: linear-gradient(140deg, #151518, #0e0e10); padding: 22px; border: 1px solid var(--border); border-radius: 14px; min-width: 0; }
+.cash-metrics > div > span { display: block; color: var(--text-secondary); font-size: 12px; margin-bottom: 12px; }
+.cash-metrics strong { font-size: clamp(20px, 2.2vw, 32px); letter-spacing: -.04em; display: block; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.cash-metrics strong small { font-size: 12px; display: block; color: var(--text-muted); margin-top: 5px; font-weight: 400; letter-spacing: normal; }
+.cash-metrics .cash-net { white-space: normal; }
+.cash-difference { padding: 16px; margin: 20px 0; border: 1px solid #f2c66433; border-radius: 10px; background: #f2c66408; color: var(--text-secondary); line-height: 1.7; font-size: 13px; }
+.cash-net { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cash-positive { color: var(--success); }
+.cash-negative { color: var(--error); }
+.cash-table-wrap { overflow-x: auto; margin: 16px 0; }
+.cash-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+.cash-table th { color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; }
+.cash-table th, .cash-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.cash-table th:first-child, .cash-table td:first-child { padding-left: 0; }
+.cash-table td:first-child a { color: var(--text); text-decoration: none; font-weight: 650; }
+.cash-table a:hover { color: var(--accent-bright); }
+.cash-table small, .cash-log-row small, .cash-transfer small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+.cash-table input { width: 155px; }
+.cash-page input:not([type=checkbox]), .cash-page select { min-height: 44px; padding: 10px 12px; border-radius: 8px; max-width: 100%; }
+.cash-page select { background-color: #141417; }
+.cash-form { display: grid; gap: 24px; }
+.cash-form label, .cash-inline label, .cash-transfer label { display: grid; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+.cash-form input { width: 100%; }
+.cash-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cash-form fieldset { border: 1px solid var(--border-strong); padding: 20px; border-radius: 12px; }
+.cash-form legend { padding: 0 8px; color: var(--text-secondary); }
+.cash-player-picker { display: flex; flex-wrap: wrap; gap: 10px; }
+.cash-player-picker label { display: flex; align-items: center; gap: 10px; padding: 12px; background: #17171a; border-radius: 8px; color: var(--text); cursor: pointer; }
+.cash-player-picker input { width: 18px; height: 18px; accent-color: var(--accent-bright); }
+.cash-inline { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.cash-inline label { min-width: 0; }
+.cash-buy-in-form label { flex: 1; min-width: 160px; }
+.cash-buy-in-form { margin-top: 24px; }
+.cash-actions { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+.cash-status { display: inline-flex; padding: 7px 12px; border-radius: 30px; background: #ffbb4410; color: #f2c664; border: 1px solid #f2c66433; font-size: 11px; white-space: nowrap; }
+.cash-status-done { color: var(--success); background: #9de8c60c; border-color: #9de8c633; }
+.cash-game-link { display: flex; justify-content: space-between; align-items: center; gap: 20px; text-decoration: none; padding: 22px 0; border-top: 1px solid var(--border); }
+.cash-game-link:hover h3 { color: var(--accent-bright); }
+.cash-game-link h3 { margin: 12px 0 8px; overflow-wrap: anywhere; }
+.cash-game-link > strong { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cash-game-link > strong span { margin-left: 12px; color: var(--text-muted); }
+.cash-empty { padding: 24px 0; color: var(--text-secondary); line-height: 1.8; }
+.cash-empty h3, .cash-paid strong { color: var(--text); font-size: 22px; }
+.cash-paid strong { color: var(--success); }
+.cash-bars { display: grid; gap: 18px; margin: 28px 0 32px; }
+.cash-bar-row { display: grid; grid-template-columns: 140px 1fr 130px; align-items: center; gap: 18px; text-decoration: none; font-size: 13px; }
+.cash-bar-row > span:first-child { overflow-wrap: anywhere; }
+.cash-bar-row > .cash-net { text-align: right; }
+.cash-bar-track { position: relative; min-width: 0; height: 25px; background: #ffffff04; }
+.cash-bar-track::before { content: ''; position: absolute; top: -4px; bottom: -4px; left: 50%; width: 1px; background: #ffffff40; }
+.cash-bar { position: absolute; top: 3px; height: 19px; background: var(--success); border-radius: 3px; min-width: 0; }
+.cash-bar-negative { background: var(--error); }
+.cash-chart { margin: 28px 0; }
+.cash-chart svg { display: block; width: 100%; overflow: visible; }
+.cash-chart circle { fill: #111114; stroke: #7edce7; stroke-width: 2; cursor: pointer; }
+.cash-chart circle:hover, .cash-chart circle:focus { fill: #7edce7; stroke-width: 4; outline: none; }
+.cash-chart-readout { min-height: 38px; color: #b1e4eb; font-size: 12px; line-height: 1.7; }
+.cash-transfer { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; padding: 22px 0; border-top: 1px solid var(--border); }
+.cash-transfer > div { flex: 1; min-width: 210px; }
+.cash-transfer strong { font-size: 18px; }
+.cash-transfer strong span { color: var(--success); margin: 0 10px; }
+.cash-transfer input { width: 135px; }
+.cash-log-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.cash-log-row strong { margin-left: 12px; }
+.cash-log-row div > strong:first-child { margin-left: 0; }
+.cash-voided { opacity: .55; }
+.cash-text-button { border: 0; padding: 8px; background: transparent; color: var(--text-secondary); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.cash-page summary { cursor: pointer; color: var(--text-secondary); font-size: 13px; }
+.cash-profile { padding-top: 0; scroll-margin-top: 100px; }
+.cash-profile-binding { border-top: 1px solid var(--border); margin-top: 24px; padding-top: 20px; }
+.cash-profile-binding form { margin-top: 16px; }
+.cash-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+/* Keep the expanded navigation inside the narrow phone header. */
+@media (max-width: 850px) { .cash-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) {
+    .cash-panel { padding: 20px 16px; border-radius: 14px; }
+    .cash-page { padding-top: 20px; }
+    .cash-profile { padding-top: 0; }
+    .cash-metrics > div { padding: 18px 14px; }
+    .cash-form-grid { grid-template-columns: 1fr; }
+    .cash-bar-row { grid-template-columns: 78px 1fr 90px; gap: 8px; font-size: 11px; }
+    .cash-transfer > div { min-width: 100%; }
+    .cash-heading .button, .cash-buy-in-form button { width: 100%; }
+    .cash-game-link { align-items: start; gap: 10px; }
+    .cash-game-link > strong { font-size: 12px; padding-top: 4px; }
+    .cash-inline { gap: 10px; }
+    .cash-section-heading .cash-inline select { max-width: 190px; }
+    .cash-table th { font-size: 9px; letter-spacing: .04em; }
+    .cash-table td { font-size: 11px; }
+    .cash-table th, .cash-table td { padding: 14px 6px; }
+    .cash-table input { width: 105px; }
+}

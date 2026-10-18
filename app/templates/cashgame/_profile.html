@@ -1,0 +1,8 @@
+{% from 'cashgame/_macros.html' import form_meta, report_content %}
+<section class="cash-page cash-profile" id="cashgame-results">
+    <div class="cash-panel">
+        <div class="cash-section-heading"><div><p class="eyebrow">VID SIDAN AV TURNERINGARNA</p><h2>Cashgame-resultat</h2><p class="cash-muted">Vinster, förluster och alla avslutade spelkvällar{% if cashgame_player %} för {{ cashgame_player.name }}{% endif %}.</p></div><a class="button button-secondary" href="{{ url_for('cashgame.index') }}">Alla cashgame-resultat ↗</a></div>
+        {% if cashgame_report %}{{ report_content(cashgame_report) }}{% else %}<p class="cash-empty">Koppla den här sidan till en registrerad spelare för att visa resultaten.</p>{% endif %}
+        <details class="cash-profile-binding"><summary>Välj spelare för den här sidan</summary><form class="cash-inline" method="post" action="{{ url_for('cashgame.bind_profile', slug=cashgame_slug) }}">{{ form_meta() }}<label for="cash-profile-player">Registrerad spelare<select name="player_id" id="cash-profile-player"><option value="">Ingen kopplad spelare</option>{% for player in cashgame_players %}<option value="{{ player.id }}" {% if cashgame_player and player.id == cashgame_player.id %}selected{% endif %}>{{ player.name }}</option>{% endfor %}</select></label><button type="submit" class="button button-secondary">Spara koppling</button></form></details>
+    </div>
+</section>
